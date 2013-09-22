@@ -31,7 +31,7 @@ function Evento(tiempo, nombre, descripcion, lambda, data){
 	
 	// Y esto se utiliza en caso que el evento requiera datos
 	// adicionales. Por ejemplo, para transferir mensajes.
-	this.Data;
+	this.Data = data;
 }
 
 
@@ -439,8 +439,52 @@ function FactoryEventos(tiempo, datos){
 }
 
 
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+
+/// Funciones de distribuciones de probabilidad:
 
 
+// DistribuciónMoneda(NN)
+// Retorna true o false según un número aleatorio sea mayor
+// o menor que NN, con 0<=NN<1.
+// Se utiliza para hacer "rifas" tipo "el 80% de los mensajes
+// son devueltos". En ese caso uno usa algo así:
+//    if( DistribucionMoneda(0.80) ){...}else{...};
+// Parámetros:
+// - NN : Un número entre [0,1[
+// Retorna:
+//   true  el NN% de las veces.
+//   false el (1-NN)% de las veces.
+function DistribucionMoneda(NN){
+	return Math.random() < NN;
+	// ¿Porqué '<' y no '<='?
+	// NN = 0 querría decir un 0% de probabilidades
+	// de acertar. Pero la probabilidad de que
+	// Math.random() == 0, aunque pequeñísima, no es
+	// cero.
+}
+
+// DistribucionUniforme(a, b)
+// Produce un número floatante aleatorio usando una distribución
+// uniforme entre [a, b[.
+// Parámetros:
+// - a : cota inferior (inclusive)
+// - b : superior (excluyente)
+// Retorna:
+//   un número floatante producido con una distribución uniforme.
+// Observaciones:
+//   se utiliza el generador de númeroa aleatorios de javascript.
+function DistribucionUniforme(a, b){
+	return a + (b - a) * Math.random();
+}
+
+// DistribucionExponencial(lambda)
+
+// DistribucionX24
+
+// DistribucionX600
 
 
 
