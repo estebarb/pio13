@@ -99,4 +99,5 @@ function DistribucionNormalEstandar(){
 // Retorna:
 //   Un número flotante
 function DistribucionNormal(u, v){
+	return DistribucionNormalEstandar() * v + u;
 }
