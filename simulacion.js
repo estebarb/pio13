@@ -458,7 +458,7 @@ function FactoryEventos(tiempo, datos){
 //   true  el NN% de las veces.
 //   false el (1-NN)% de las veces.
 function DistribucionMoneda(NN){
-	return Math.random() < NN;
+	return DistribucionUniforme(0,1) < NN;
 	// ¿Porqué '<' y no '<='?
 	// NN = 0 querría decir un 0% de probabilidades
 	// de acertar. Pero la probabilidad de que
@@ -475,16 +475,35 @@ function DistribucionMoneda(NN){
 // Retorna:
 //   un número floatante producido con una distribución uniforme.
 // Observaciones:
-//   se utiliza el generador de númeroa aleatorios de javascript.
+//   se utiliza el generador de números aleatorios de javascript.
 function DistribucionUniforme(a, b){
 	return a + (b - a) * Math.random();
 }
 
 // DistribucionExponencial(lambda)
+// Produce un número flotante aleatorio usando una distribución
+// exponencial de lambda cosas por minuto.
+// Parámetros:
+// - lambda : Cantidad "cosas" por minuto
+// Retorna:
+//   Un número flotante producido con una distribución exponencial.
+function DistribucionExponencial(lambda){
+	return Math.log(1 - DistribucionUniforme(0,1)) / (-lambda);
+}
 
-// DistribucionX24
+// DistribucionX24()
+// Produce un número flotante aleatorio usando que tiene una
+// función de distribución de probabilidad de x/24, con 4<x<8.
+function DistribucionX24(){
+	return 4 * Math.sqrt(3 * DistribucionUniforme(0,1) + 1);
+}
 
-// DistribucionX600
 
+// DistribucionX600()
+// Produce un número flotante aleatorio usando que tiene una
+// función de distribución de probabilidad de x/600, con 20<x<40.
+function DistribucionX600(){
+	return 20 * Math.sqrt(3 * DistribucionUniforme(0,1) + 1);
+}
 
 
