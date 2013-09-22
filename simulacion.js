@@ -162,10 +162,6 @@ function Estado(Reloj, Colas, Eventos, Estados, Estadisticas){
 	this.Estadisticas = Estadisticas;
 }
 
-
-
-
-
 //////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
@@ -198,6 +194,74 @@ function SimulationStep(estado){
 	return evento.Lambda(estado, evento.Data);
 }
 
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+
+// Manejo de los eventos
+// Las siguientes funciones insertan un evento en una lista
+// de eventos o bien obtienen (y borran) el evento más cercano.
+
+// PushEvent(evento, estado)
+// Inserta un evento en la lista de eventos
+// Recibe:
+// - evento: el nuevo evento que se ingresará a la lista
+// - estado: Un estado del sistema
+// Retorna:
+//   Un nuevo estado con el nuevo evento agregado.
+// Observaciones:
+//   La lista de eventos del estado está ordenada por 
+// orden de aparición del evento. Se utiliza "insert sort".
+function PushEvent(evento, estado){	
+	var lista = estado.Eventos;
+	var tmp, anterior = evento;
+	for(var i = 0; i < lista.length; i++){
+		if(lista[i].Tiempo > anterior.Tiempo){
+			tmp = lista[i];
+			lista[i] = anterior;
+			anterior = tmp;
+		}
+	}
+	lista.push(anterior);
+	estado.Eventos = lista
+	return estado;
+}
+
+// PeekEvent(estado)
+// Retorna el evento más cercano a suceder de la
+// lista de eventos de un estado.
+// Parámetros:
+// - estado: Un estado con eventos
+// Retorna:
+//   El evento más próximo
+function PeekEvent(estado){
+	var lista = estado.Eventos;
+	if (lista.length > 0){
+		return lista[0];
+	} else {
+		return null;
+	}
+}
+
+// PopEvent(estado)
+// Elimina el evento más cercano a suceder de la
+// lista de eventos.
+// Parámetros:
+// - estado: un estado con una lista de eventos
+// Retorna:
+//   Un nuevo estado sin el primer evento.
+function PopEvent(estado){
+	var lista = estado.Eventos;
+	// Como la lista es construida usando
+	// PushEvent estamos seguros que está
+	// ordenada por tiempo de ejecución
+	// del evento.
+	// Por lo tanto, basta con eliminar 
+	// el primer elemento.
+	lista.shift();
+	estado.Eventos = lista;
+	return estado;
+}
 
 
 
