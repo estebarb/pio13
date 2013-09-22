@@ -60,7 +60,10 @@ function DistribucionExponencial(lambda){
 // Produce un número flotante aleatorio usando que tiene una
 // función de distribución de probabilidad de x/24, con 4<x<8.
 function DistribucionX24(){
-	return 4 * Math.sqrt(3 * DistribucionUniforme(0,1) + 1);
+	// Primero se saca el valor aleatorio en segundos
+	var dissegundos = 4 * Math.sqrt(3 * DistribucionUniforme(0,1) + 1);
+	// Y luego se convierte a minutos
+	return dissegundos / 60;
 }
 
 
@@ -68,5 +71,8 @@ function DistribucionX24(){
 // Produce un número flotante aleatorio usando que tiene una
 // función de distribución de probabilidad de x/600, con 20<x<40.
 function DistribucionX600(){
-	return 20 * Math.sqrt(3 * DistribucionUniforme(0,1) + 1);
+	// Primero en segundos
+	var dissegundos = 20 * Math.sqrt(3 * DistribucionUniforme(0,1) + 1);
+	// Luego se transforma en minutos
+	return dissegundos / 60;
 }
