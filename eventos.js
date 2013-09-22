@@ -25,7 +25,7 @@
 
 // A saber, los eventos del sistema son:
 // Creación de mensajes
-// (TODO) Se crea un mensaje para B/2
+// (DONE) Se crea un mensaje para B/2
 // (TODO) Se crea un mensaje para C/3
 // Recibir mensaje
 // (TODO) Se recibe un mensaje en A/1
@@ -40,7 +40,7 @@
 // (TODO) Mensaje RECHAZADO
 // (TODO) Mensaje ENVIADO
 
-
+//////////////////////////////////////////////////////////////////
 // El flujo de eventos es algo así:
 //   Se crea un mensaje
 //          |
@@ -57,6 +57,7 @@
 //         V                           V
 //      Desencolar                Recibir mensaje
 //   y recibir mensaje
+//////////////////////////////////////////////////////////////////
 
 // Crea un mensaje que será recibido
 // por la computadora B.
@@ -65,9 +66,9 @@ function HandlerCrearMensajeB(estado, data){
 	var msg = CrearMensaje(estado);
 	// Se debe crear un evento para que se reciba
 	// el mensaje:
-	var evento = FactoryEventos(
+	var evento = new FactoryEventos(
 					estado.Reloj,
-					{mensaje: msg}).CrearMensajeB();
+					{mensaje: msg}).RecibirMensajeB();
     // (Como el transporte en este caso es instantáneo
     // usamos el mismo reloj)
     
@@ -76,12 +77,97 @@ function HandlerCrearMensajeB(estado, data){
     
     // Por otro lado debemos volver a calendarizar
     // el evento de creación de mensajes.
-    // B recibe un mensaje nuevo cada
+    // B recibe un mensaje según una distribución normal
+    // con media 15s y varianza 1s²
+    var repeticion = new FactoryEventos(
+    					estado.Reloj + DistribucionNormal(15, 1)/60,
+    					null).CrearMensajeB();
+    estado = PushEvent(repeticion, estado);
+    
+    // Y devolvemos el nuevo estado de la simulación
+    return estado;
 }
+
+// Crea un mensaje que será recibido
+// por la computadora C.
+function HandlerCrearMensajeC(estado, data){
+	// Se crea un mensaje en el instante actual.
+	var msg = CrearMensaje(estado);
+	// Se debe crear un evento para que se reciba
+	// el mensaje:
+	var evento = new FactoryEventos(
+					estado.Reloj,
+					{mensaje: msg}).RecibirMensajeC();
+    // (Como el transporte en este caso es instantáneo
+    // usamos el mismo reloj)
+    
+    // Ahora creamos el nuevo evento (C recibe mensaje nuevo):
+    estado = PushEvent(evento, estado);
+    
+    // Por otro lado debemos volver a calendarizar
+    // el evento de creación de mensajes.
+    // C recibe un mensaje según una distribución
+    // x/24, con x entre 4 y 8 segundos.
+    // DistribucionX24() lo convierte a minutos.
+    var repeticion = new FactoryEventos(
+    					estado.Reloj + DistribucionX24(),
+    					null).CrearMensajeC();
+    estado = PushEvent(repeticion, estado);
+    
+    // Y devolvemos el nuevo estado de la simulación
+    return estado;
+}
+
+//////////////////////////////////////////////////////////////////
+
+
+// Recibe un mensaje en la computadora C
+function HandlerRecibirMensajeC(estado, data){
+	var msg = data.mensaje;
+	// Se actualizan las estadísticas de transmisión
+	msg.TiempoTransmision.C += DeltaTiempo(estado, msg)
+	// Se guarda la hora de encolamiento:
+	msg.HoraEvento = estado.Reloj;
+	
+	// Si no está ocupado vamos a atender el mensaje
+	if (! estado.Estados.C){
+		// Ahora está ocupado:
+		estado.Estados.C = true;
+		// Tiempo atendiéndose:
+		var ta = DistribucionExponencial(60/4)
+		// Se actualizan las estadísticas:
+		msg.TiempoProcesamiento.C += ta;
+		// Se configura el evento "mensaje atendido por C":
+		var evento = new FactoryEventos(
+			estado.Reloj + ta,
+			{mensaje: msg}
+			).AtendidoMensajeC();
+		// Y se programa el evento:
+		estado = PushEvent(evento, estado);
+	} else {
+		// Sino solamente lo encolamos:
+		estado.Colas.C.push(msg);
+	}
+	
+	return estado;
+}
+
+//////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////
+
 
 //////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////
+
+// DeltaTiempo(estado, mensaje)
+// Devuelve la cantidad de minutos que pasaron entre
+// el evento anterior en el que participó el mensaje
+// y el reloj actual de la simulación.
+function DeltaTiempo(estado, mensaje){
+	return estado.Reloj - mensaje.HoraEvento;
+}
 
 // Aquí van métodos auxiliares que sirven
 // para crear eventos.
