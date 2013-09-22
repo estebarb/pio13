@@ -9,17 +9,21 @@
 // Una simulación tiene eventos. Los eventos serán representados
 // por un objeto, que contendrán un tiempo de ocurrencia y una 
 // función que devolverá el estado siguiente de la simulación.
-function Evento(tiempo, lambda){
+function Evento(tiempo, nombre, descripcion, lambda){
 	// tiempo es la hora de ocurrencia de un evento,
 	// medida en minutos.
-	this.tiempo = tiempo;
+	this.Tiempo = tiempo;
 	// lambda es una función que recibe un estado del sistema
 	// y retorna el siguiente estado del sistema.
 	// Tiene la siguiente forma:
 	// function(estado){
 	//    return EstadoSiguiente(estado);
 	// }
-	this.lambda = lambda;
+	this.Lambda = lambda;
+	
+	// Y esto sirve para describir el evento:
+	this.Nombre = nombre;
+	this.Descripcion = descripcion;
 }
 
 
@@ -75,6 +79,14 @@ function Estadisticas(NumMsg, Reloj, TiempoComputo, TiempoEnSistema, Devolucione
 // sistema. El estado del sistema es representado
 // por el siguiente objeto:
 function Estado(Reloj, Colas, Eventos, Estados, Estadisticas){
+	// Este es el evento que se está ejecutando actualmente.
+	// Se guarda acá para hacer el binding con la GUI, por
+	// lo demás no es necesario.
+	this.Ejecutando = null;
+	
+	// Esta simulación aún no ha terminado.
+	this.Finished = false;
+	
 	// El estado guarda el reloj del 
 	// estado actual de la simulación:
 	this.Reloj = Reloj;
@@ -112,9 +124,116 @@ function Estado(Reloj, Colas, Eventos, Estados, Estadisticas){
 }
 
 
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+
+// Manejo de los eventos
+// Las siguientes funciones insertan un evento en una lista
+// de eventos o bien obtienen (y borran) el evento más cercano.
+
+// PushEvent(evento, lista)
+// Inserta un evento en la lista de eventos
+// Recibe:
+// - evento: el nuevo evento que se ingresará a la lista
+// - lista: una lista formada por objetos "Evento"
+// Retorna:
+//   Una lista de eventos con el nuevo evento agregado
+// Observaciones:
+//   La lista está ordenada por orden de aparición del
+//   evento. Se utiliza "insert sort".
+function PushEvent(evento, lista){	
+	var tmp, anterior = evento;
+	for(var i = 0; i < lista.length; i++){
+		if(lista[i].Tiempo > anterior.Tiempo){
+			tmp = lista[i];
+			lista[i] = anterior;
+			anterior = tmp;
+		}
+	}
+	lista.push(anterior);
+	
+	return lista;
+}
+
+// PeekEvent(lista)
+// Retorna el evento más cercano a suceder de la
+// lista.
+// Parámetros:
+// - lista: una lista de eventos (construida con PushEvent).
+// Retorna:
+//   El evento más próximo
+function PeekEvent(lista){
+	if (lista.length > 0){
+		return lista[0];
+	} else {
+		return null;
+	}
+}
+
+// PopEvent(lista)
+// Elimina el evento más cercano a suceder de la
+// lista.
+// Parámetros:
+// - lista: una lista de eventos
+// Retorna:
+//   Una lista sin el primer evento.
+function PopEvent(lista){
+	// Como la lista es construida usando
+	// PushEvent estamos seguros que está
+	// ordenada por tiempo de ejecución
+	// del evento.
+	// Por lo tanto, basta con eliminar 
+	// el primer elemento.
+	lista.shift();
+	return lista;
+}
 
 
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
 
+// Funciones del simulador
+
+// SimulationStep(estado)
+// Ejecuta un paso de la simulación y devuelve el nuevo
+// estado.
+// Recibe:
+// - estado: un estado de una simulación
+// Retorna:
+//   El siguiente estado de la simulación
+function SimulationStep(estado){
+	var evento;
+	
+	// Toma el evento más reciente
+	evento = PeekEvent(estado.Eventos);
+	// Y lo borra de la lista de eventos:
+	estado.Eventos = PopEvent(estado.Eventos);
+	
+	// Actualiza el reloj:
+	estado.Reloj = evento.Tiempo;
+	
+	// Y escribe cual evento se está
+	// ejecutando ahora, para poder
+	// hacer binding en la GUI.
+	estado.Ejecutando = evento;
+	
+	return evento.Lambda(estado);
+}
+
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////
+
+// Definición de eventos
+// Los eventos son representados como funciones que devuelven
+// el estado futuro del sistema dado un estado actual.
+// La definición de los eventos como funciones puras tiene
+// varios efectos secundarios deseados (sic. jajajajaja):
+// - Es posible modificar el estado de la simulación
+//   de forma atómica/transaccional.
+// - 
 
 
 
