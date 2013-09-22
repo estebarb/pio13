@@ -1,6 +1,10 @@
 // Simulación de Investigación de Operaciones
 // Esteban Rodríguez Betancourt
 // B15512
+//
+//
+// (Recomiendo ver el código usando tabulaciones de
+//  cuatro caracteres).
 
 // TODAS las mediciones de tiempo serán realizadas en
 // minutos.
@@ -38,13 +42,44 @@ function Evento(tiempo, nombre, descripcion, lambda){
 // Tiempo en transmisión {A:0, B:0, C:0}
 // Tiempo en procesamiento {A:0, B:0, C:0}
 function Mensaje(HoraCreacion, HoraEvento, Devoluciones, PCanterior, TiempoColas, TiempoTransmisión, TiempoProcesamiento){
+	// Hora de creación del mensaje actual
 	this.HoraCreacion = HoraCreacion;
+	
+	// Hora del evento actual/anterior
 	this.HoraEvento = HoraEvento;
+	
+	// Cantidad de veces que ha sido devuelto a PC B, C
 	this.Devoluciones = Devoluciones;
+	
+	// PC en la que estaba en el evento anterior.
 	this.PCanterior = PCanterior;
+	
+	// Tiempo en minutos que ha estado en cola en una PC
 	this.TiempoColas = TiempoColas;
+	
+	// Tiempo que ha estado en transmisión.
 	this.TiempoTransmision = TiempoTransmision;
+	
+	// Tiempo en minutos que ha estado procesándose.
 	this.TiempoProcesamiento = TiempoProcesamiento;
+}
+
+// CrearMensaje
+// Crea un mensaje en el instante actual y lo devuelve.
+// Parámetros:
+// - estado: Estado actual del sistema
+// Retorna:
+// - Un nuevo mensaje creado en el reloj actual del estado.
+function CrearMensaje(estado){
+	return new Mensaje(
+		estado.Reloj,		// Hora creación
+		estado.Reloj,		// Hora evento
+		{B: 0, C: 0},		// Devoluciones
+		0,					// PC anterior
+		{A:0, B: 0, C: 0},	// T. Colas
+		{A:0, B: 0, C: 0},	// T. Transmisión
+		{A:0, B: 0, C: 0}	// T. Procesamiento
+		);
 }
 
 // Las estadísticas que deseamos recolectar 
@@ -219,6 +254,8 @@ function SimulationStep(estado){
 	// hacer binding en la GUI.
 	estado.Ejecutando = evento;
 	
+	// Ejecuta el evento actual y retorna
+	// el nuevo estado del sistema.
 	return evento.Lambda(estado);
 }
 
@@ -231,10 +268,61 @@ function SimulationStep(estado){
 // el estado futuro del sistema dado un estado actual.
 // La definición de los eventos como funciones puras tiene
 // varios efectos secundarios deseados (sic. jajajajaja):
-// - Es posible modificar el estado de la simulación
-//   de forma atómica/transaccional.
-// - 
+// - Es posible modificar un estado sin afectar, por ejemplo,
+//   la GUI.
+// - Las modificaciones del estado se pueden dar de forma
+//   atómica. ¡Es una simulación discreta!
+// - No es necesario que el código de la simulación tenga
+//   conocimiento alguno sobre los eventos. ¡Solo los corre!
+// Nótese que estas funciones NO deben actualizar el reloj
+// del sistema, pues esto es responsabilidad del simulador.
 
+// A saber, los eventos del sistema son:
+// Creación de mensajes
+// (TODO) Se crea un mensaje para B/2
+// (TODO) Se crea un mensaje para C/3
+// Recibir mensaje
+// (TODO) Se recibe un mensaje en A/1
+// (TODO) Se recibe un mensaje en B/2
+// (TODO) Se recibe un mensaje en C/3
+// Encolamiento de mensajes
+// (TODO) Se encola un mensaje para A/1
+// (TODO) Se encola un mensaje para B/2
+// (TODO) Se encola un mensaje para C/3
+// Se atendió un mensaje
+// (TODO) Se atendió un mensaje en A/1
+// (TODO) Se atendió un mensaje en B/2 CPU 1
+// (TODO) Se atendió un mensaje en B/2 CPU 2
+// (TODO) Se atendió un mensaje en C/3
+
+
+// El flujo de eventos es algo así:
+//   Se crea un mensaje
+//          |
+//          V
+//    Recibir mensaje
+//    Si está ocupado  ----->  Encolar mensaje
+//         Sino
+//           |
+//           V
+//   Se atendió mensaje ---> Y crear un recibir mensaje
+//       Si se rechaza ------> Rechazar mensaje
+//    Si hay MSG en cola       (actualiza estadísticas)
+//         |                           |- o bien -> Descartar
+//         V                           V
+//      Desencolar                Recibir mensaje
+//   y recibir mensaje
+
+// Crea un mensaje que será recibido
+// por la computadora B.
+function EventoCrearMensajeB(estado){
+	// Cuando se crea un mensaje para B
+	// se debe crear un mensaje	
+}
+
+
+////// Funciones auxiliares //////
+function NewMessage
 
 
 
