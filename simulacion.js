@@ -412,32 +412,32 @@ function FactoryEventos(tiempo, datos){
 			HandlerEncolarMensajeC,
 			datos);
 	};
-	asdf
+	
 	// Se atendió un mensaje
 	this.AtendidoMensajeA = function()	{
 		return new Evento(
 			tiempo,
 			"A atendió un mensaje",
 			"A atendio un mensaje",
-			HandlerRecibirMensajeA,
+			HandlerAtendidoMensajeA,
 			datos);
 	};
-	asdf
+	
 	this.AtendidoMensajeB = function()	{
 		return new Evento(
 			tiempo,
 			"B atendió un mensaje",
 			"B atendió un mensaje",
-			HandlerRecibirMensajeB,
+			HandlerAtendidoMensajeB,
 			datos);
 	};
-	asdf
+	
 	this.AtendidoMensajeC = function()	{
 		return new Evento(
 			tiempo,
 			"C atendió un mensaje",
 			"C atendió un mensaje",
-			HandlerRecibirMensajeC,
+			HandlerAtendidoMensajeC,
 			datos);
 	};
 	
@@ -445,22 +445,22 @@ function FactoryEventos(tiempo, datos){
 	// Estos eventos se utilizan para llevar un control
 	// de las estadísticas cuando los mensajes salen del
 	// sistema
-	asdfasdf
+	
 	this.MetaEnviado = function()	{
 		return new Evento(
 			0,
 			"Mensaje enviado",
-			"Se ha creado un mensaje nuevo para que sea recibido por B",
-			HandlerCrearMensajeB,
+			"Se envió el mensaje exitosamente",
+			HandlerMetaEnviado,
 			datos);
 	};
 	
 	this.MetaRechazado = function()	{
 		return new Evento(
 			0,
-			"Crear mensaje para C",
-			"Se ha creado un mensaje nuevo para que sea recibido por C",
-			HandlerCrearMensajeC,
+			"Mensaje rechazado",
+			"El abortó el envío de un mensaje",
+			HandlerMetaRechazado,
 			datos);
 	};
 }
