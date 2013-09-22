@@ -13,21 +13,25 @@
 // Una simulación tiene eventos. Los eventos serán representados
 // por un objeto, que contendrán un tiempo de ocurrencia y una 
 // función que devolverá el estado siguiente de la simulación.
-function Evento(tiempo, nombre, descripcion, lambda){
+function Evento(tiempo, nombre, descripcion, lambda, data){
 	// tiempo es la hora de ocurrencia de un evento,
 	// medida en minutos.
 	this.Tiempo = tiempo;
 	// lambda es una función que recibe un estado del sistema
 	// y retorna el siguiente estado del sistema.
 	// Tiene la siguiente forma:
-	// function(estado){
-	//    return EstadoSiguiente(estado);
+	// function(estado, data){
+	//    return EstadoSiguiente(estado, data);
 	// }
 	this.Lambda = lambda;
 	
 	// Y esto sirve para describir el evento:
 	this.Nombre = nombre;
 	this.Descripcion = descripcion;
+	
+	// Y esto se utiliza en caso que el evento requiera datos
+	// adicionales. Por ejemplo, para transferir mensajes.
+	this.Data;
 }
 
 
@@ -167,17 +171,18 @@ function Estado(Reloj, Colas, Eventos, Estados, Estadisticas){
 // Las siguientes funciones insertan un evento en una lista
 // de eventos o bien obtienen (y borran) el evento más cercano.
 
-// PushEvent(evento, lista)
+// PushEvent(evento, estado)
 // Inserta un evento en la lista de eventos
 // Recibe:
 // - evento: el nuevo evento que se ingresará a la lista
-// - lista: una lista formada por objetos "Evento"
+// - estado: Un estado del sistema
 // Retorna:
-//   Una lista de eventos con el nuevo evento agregado
+//   Un nuevo estado con el nuevo evento agregado.
 // Observaciones:
-//   La lista está ordenada por orden de aparición del
-//   evento. Se utiliza "insert sort".
-function PushEvent(evento, lista){	
+//   La lista de eventos del estado está ordenada por 
+// orden de aparición del evento. Se utiliza "insert sort".
+function PushEvent(evento, estado){	
+	var lista = estado.Eventos;
 	var tmp, anterior = evento;
 	for(var i = 0; i < lista.length; i++){
 		if(lista[i].Tiempo > anterior.Tiempo){
@@ -187,18 +192,19 @@ function PushEvent(evento, lista){
 		}
 	}
 	lista.push(anterior);
-	
-	return lista;
+	estado.Eventos = lista
+	return estado;
 }
 
-// PeekEvent(lista)
+// PeekEvent(estado)
 // Retorna el evento más cercano a suceder de la
-// lista.
+// lista de eventos de un estado.
 // Parámetros:
-// - lista: una lista de eventos (construida con PushEvent).
+// - estado: Un estado con eventos
 // Retorna:
 //   El evento más próximo
-function PeekEvent(lista){
+function PeekEvent(estado){
+	var lista = estado.Eventos;
 	if (lista.length > 0){
 		return lista[0];
 	} else {
@@ -206,14 +212,15 @@ function PeekEvent(lista){
 	}
 }
 
-// PopEvent(lista)
+// PopEvent(estado)
 // Elimina el evento más cercano a suceder de la
-// lista.
+// lista de eventos.
 // Parámetros:
-// - lista: una lista de eventos
+// - estado: un estado con una lista de eventos
 // Retorna:
-//   Una lista sin el primer evento.
-function PopEvent(lista){
+//   Un nuevo estado sin el primer evento.
+function PopEvent(estado){
+	var lista = estado.Eventos;
 	// Como la lista es construida usando
 	// PushEvent estamos seguros que está
 	// ordenada por tiempo de ejecución
@@ -221,7 +228,8 @@ function PopEvent(lista){
 	// Por lo tanto, basta con eliminar 
 	// el primer elemento.
 	lista.shift();
-	return lista;
+	estado.Eventos = lista;
+	return estado;
 }
 
 
@@ -238,13 +246,11 @@ function PopEvent(lista){
 // - estado: un estado de una simulación
 // Retorna:
 //   El siguiente estado de la simulación
-function SimulationStep(estado){
-	var evento;
-	
+function SimulationStep(estado){	
 	// Toma el evento más reciente
-	evento = PeekEvent(estado.Eventos);
+	var evento = PeekEvent(estado);
 	// Y lo borra de la lista de eventos:
-	estado.Eventos = PopEvent(estado.Eventos);
+	estado = PopEvent(estado);
 	
 	// Actualiza el reloj:
 	estado.Reloj = evento.Tiempo;
@@ -256,7 +262,7 @@ function SimulationStep(estado){
 	
 	// Ejecuta el evento actual y retorna
 	// el nuevo estado del sistema.
-	return evento.Lambda(estado);
+	return evento.Lambda(estado, evento.Data);
 }
 
 //////////////////////////////////////////////////////////////////
@@ -315,14 +321,11 @@ function SimulationStep(estado){
 
 // Crea un mensaje que será recibido
 // por la computadora B.
-function EventoCrearMensajeB(estado){
+function EventoCrearMensajeB(estado, data){
 	// Cuando se crea un mensaje para B
-	// se debe crear un mensaje	
+	// se debe crear un mensaje
+	msg = CrearMensaje(estado);
 }
-
-
-////// Funciones auxiliares //////
-function NewMessage
 
 
 
