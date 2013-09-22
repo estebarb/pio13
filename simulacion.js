@@ -300,6 +300,9 @@ function SimulationStep(estado){
 // (TODO) Se atendió un mensaje en B/2 CPU 1
 // (TODO) Se atendió un mensaje en B/2 CPU 2
 // (TODO) Se atendió un mensaje en C/3
+// Metaeventos (actualizan estadísticas):
+// (TODO) Mensaje RECHAZADO
+// (TODO) Mensaje ENVIADO
 
 
 // El flujo de eventos es algo así:
@@ -321,10 +324,145 @@ function SimulationStep(estado){
 
 // Crea un mensaje que será recibido
 // por la computadora B.
-function EventoCrearMensajeB(estado, data){
+function HandlerCrearMensajeB(estado, data){
 	// Cuando se crea un mensaje para B
 	// se debe crear un mensaje
-	msg = CrearMensaje(estado);
+	var msg = CrearMensaje(estado);
+}
+
+// Aquí van métodos auxiliares que sirven
+// para crear eventos.
+// Cada evento tiene asociado un tiempo de ocurrencia,
+// un Lambda, nombre, descripción y datos asociados.
+function FactoryEventos(tiempo, datos){
+	// new Evento(tiempo, nombre, descripcion, lambda, data);
+	
+	
+	// Creación de mensajes
+	this.CrearMensajeB = function()	{
+		return new Evento(
+			tiempo,
+			"Crear mensaje para B",
+			"Se ha creado un mensaje nuevo para que sea recibido por B",
+			HandlerCrearMensajeB,
+			datos);
+	};
+	
+	this.CrearMensajeC = function()	{
+		return new Evento(
+			tiempo,
+			"Crear mensaje para C",
+			"Se ha creado un mensaje nuevo para que sea recibido por C",
+			HandlerCrearMensajeC,
+			datos);
+	};
+	
+	// Recibir mensajes
+	this.RecibirMensajeA = function()	{
+		return new Evento(
+			tiempo,
+			"A recibe un mensaje",
+			"Se ha creado un mensaje nuevo para que sea recibido por A",
+			HandlerRecibirMensajeA,
+			datos);
+	};
+	
+	this.RecibirMensajeB = function()	{
+		return new Evento(
+			tiempo,
+			"B recibe un mensaje",
+			"Se ha creado un mensaje nuevo para que sea recibido por B",
+			HandlerRecibirMensajeB,
+			datos);
+	};
+	
+	this.RecibirMensajeC = function()	{
+		return new Evento(
+			tiempo,
+			"C recibe un mensaje",
+			"Se ha creado un mensaje nuevo para que sea recibido por C",
+			HandlerRecibirMensajeC,
+			datos);
+	};
+	
+	// Encolamiento de mensajes
+	this.EncolarMensajeA = function()	{
+		return new Evento(
+			tiempo,
+			"A recibe un mensaje",
+			"Se ha encolado un mensaje para que sea atendido por A",
+			HandlerEncolarMensajeA,
+			datos);
+	};
+	
+	this.EncolarMensajeB = function()	{
+		return new Evento(
+			tiempo,
+			"B recibe un mensaje",
+			"Se ha encolado un mensaje para que sea atendido por B",
+			HandlerEncolarMensajeB,
+			datos);
+	};
+	
+	this.EncolarMensajeC = function()	{
+		return new Evento(
+			tiempo,
+			"C recibe un mensaje",
+			"Se ha encolado un mensaje para que sea atendido por C",
+			HandlerEncolarMensajeC,
+			datos);
+	};
+	asdf
+	// Se atendió un mensaje
+	this.AtendidoMensajeA = function()	{
+		return new Evento(
+			tiempo,
+			"A atendió un mensaje",
+			"A atendio un mensaje",
+			HandlerRecibirMensajeA,
+			datos);
+	};
+	asdf
+	this.AtendidoMensajeB = function()	{
+		return new Evento(
+			tiempo,
+			"B atendió un mensaje",
+			"B atendió un mensaje",
+			HandlerRecibirMensajeB,
+			datos);
+	};
+	asdf
+	this.AtendidoMensajeC = function()	{
+		return new Evento(
+			tiempo,
+			"C atendió un mensaje",
+			"C atendió un mensaje",
+			HandlerRecibirMensajeC,
+			datos);
+	};
+	
+	// Metaeventos:
+	// Estos eventos se utilizan para llevar un control
+	// de las estadísticas cuando los mensajes salen del
+	// sistema
+	asdfasdf
+	this.MetaEnviado = function()	{
+		return new Evento(
+			0,
+			"Mensaje enviado",
+			"Se ha creado un mensaje nuevo para que sea recibido por B",
+			HandlerCrearMensajeB,
+			datos);
+	};
+	
+	this.MetaRechazado = function()	{
+		return new Evento(
+			0,
+			"Crear mensaje para C",
+			"Se ha creado un mensaje nuevo para que sea recibido por C",
+			HandlerCrearMensajeC,
+			datos);
+	};
 }
 
 
