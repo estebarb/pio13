@@ -76,3 +76,27 @@ function DistribucionX600(){
 	// Luego se transforma en minutos
 	return dissegundos / 60;
 }
+
+// DistribucionNormal()
+// Produce un número flotante aleatorio que sigue una distribución
+// normal estandar
+// Retorna:
+//   Un número flotante
+function DistribucionNormalEstandar(){
+	var acum = 0;
+	for(var i = 0; i < 12; i++){
+		acum += DistribucionUniforme(0, 1);
+	}
+	return acum - 6;
+}
+
+// DistribucionNormal(u, v)
+// Produce un número flotante aleatorio que sigue una distribución
+// normal de media u y varianza v.
+// Parámetros:
+// - u : media de la districión normal
+// - v : varianza de la distribución normal
+// Retorna:
+//   Un número flotante
+function DistribucionNormal(u, v){
+}
