@@ -291,10 +291,6 @@ function SimulationStep(estado){
 // (TODO) Se recibe un mensaje en A/1
 // (TODO) Se recibe un mensaje en B/2
 // (TODO) Se recibe un mensaje en C/3
-// Encolamiento de mensajes
-// (TODO) Se encola un mensaje para A/1
-// (TODO) Se encola un mensaje para B/2
-// (TODO) Se encola un mensaje para C/3
 // Se atendió un mensaje
 // (TODO) Se atendió un mensaje en A/1
 // (TODO) Se atendió un mensaje en B/2 CPU 1
@@ -385,35 +381,12 @@ function FactoryEventos(tiempo, datos){
 			datos);
 	};
 	
-	// Encolamiento de mensajes
-	this.EncolarMensajeA = function()	{
-		return new Evento(
-			tiempo,
-			"A recibe un mensaje",
-			"Se ha encolado un mensaje para que sea atendido por A",
-			HandlerEncolarMensajeA,
-			datos);
-	};
-	
-	this.EncolarMensajeB = function()	{
-		return new Evento(
-			tiempo,
-			"B recibe un mensaje",
-			"Se ha encolado un mensaje para que sea atendido por B",
-			HandlerEncolarMensajeB,
-			datos);
-	};
-	
-	this.EncolarMensajeC = function()	{
-		return new Evento(
-			tiempo,
-			"C recibe un mensaje",
-			"Se ha encolado un mensaje para que sea atendido por C",
-			HandlerEncolarMensajeC,
-			datos);
-	};
-	
 	// Se atendió un mensaje
+	// Estos eventos son creados cuando se recibe
+	// un mensaje (si no hay mensajes en cola) o
+	// bien cuando se termina de atender otro mensaje.
+	// Deben enviar el mensaje a la PC correspondiente
+	// y atender el mensaje siguiente (si existe en cola).
 	this.AtendidoMensajeA = function()	{
 		return new Evento(
 			tiempo,
