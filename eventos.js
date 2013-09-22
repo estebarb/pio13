@@ -26,7 +26,7 @@
 // A saber, los eventos del sistema son:
 // Creación de mensajes
 // (DONE) Se crea un mensaje para B/2
-// (TODO) Se crea un mensaje para C/3
+// (DONE) Se crea un mensaje para C/3
 // Recibir mensaje
 // (TODO) Se recibe un mensaje en A/1
 // (TODO) Se recibe un mensaje en B/2
@@ -134,9 +134,7 @@ function HandlerRecibirMensajeC(estado, data){
 		// Ahora está ocupado:
 		estado.Estados.C = true;
 		// Tiempo atendiéndose:
-		var ta = DistribucionExponencial(60/4)
-		// Se actualizan las estadísticas:
-		msg.TiempoProcesamiento.C += ta;
+		var ta = DistribucionExponencial(60/4);
 		// Se configura el evento "mensaje atendido por C":
 		var evento = new FactoryEventos(
 			estado.Reloj + ta,
@@ -147,6 +145,76 @@ function HandlerRecibirMensajeC(estado, data){
 	} else {
 		// Sino solamente lo encolamos:
 		estado.Colas.C.push(msg);
+	}
+	
+	return estado;
+}
+
+// Recibe un mensaje en la computadora B
+function HandlerRecibirMensajeB(estado, data){
+	var msg = data.mensaje;
+	// Se actualizan las estadísticas de transmisión
+	msg.TiempoTransmision.B += DeltaTiempo(estado, msg)
+	// Se guarda la hora de encolamiento:
+	msg.HoraEvento = estado.Reloj;
+	
+	// Si hay algún CPU desocupado atenderemos el mensaje
+	if (! estado.Estados.B1){
+		// B1 ahora está ocupado
+		estado.Estados.B1 = true;
+		// Tiempo atendiéndose:
+		var ta = DistribucionUniforme(12/60, 25/60);
+		// Se configura el evento "mensaje atendido por B":
+		var evento = new FactoryEventos(
+			estado.Reloj + ta,
+			{mensaje: msg}
+			).AtendidoMensajeB1();
+		// Y se programa el evento:
+		estado = PushEvent(evento, estado);
+	} else if (! estado.Estados.B2){
+		// B2 ahora está ocupado
+		estado.Estados.B2 = true;
+		// Tiempo atendiéndose:
+		var ta = DistribucionUniforme(12/60, 25/60);
+		// Se configura el evento "mensaje atendido por B":
+		var evento = new FactoryEventos(
+			estado.Reloj + ta,
+			{mensaje: msg}
+			).AtendidoMensajeB2();
+		// Y se programa el evento:
+		estado = PushEvent(evento, estado);
+	} else {
+		// Sino solamente lo encolamos:
+		estado.Colas.B.push(msg);
+	}
+	
+	return estado;
+}
+
+// Recibe un mensaje en la computadora A
+function HandlerRecibirMensajeA(estado, data){
+	var msg = data.mensaje;
+	// Se actualizan las estadísticas de transmisión
+	msg.TiempoTransmision.A += DeltaTiempo(estado, msg)
+	// Se guarda la hora de encolamiento:
+	msg.HoraEvento = estado.Reloj;
+	
+	// Si no está ocupado vamos a atender el mensaje
+	if (! estado.Estados.A){
+		// Ahora está ocupado:
+		estado.Estados.A = true;
+		// Tiempo atendiéndose:
+		var ta = DistribucionExponencial(10);
+		// Se configura el evento "mensaje atendido por A":
+		var evento = new FactoryEventos(
+			estado.Reloj + ta,
+			{mensaje: msg}
+			).AtendidoMensajeA();
+		// Y se programa el evento:
+		estado = PushEvent(evento, estado);
+	} else {
+		// Sino solamente lo encolamos:
+		estado.Colas.A.push(msg);
 	}
 	
 	return estado;
@@ -236,10 +304,19 @@ function FactoryEventos(tiempo, datos){
 			datos);
 	};
 	
-	this.AtendidoMensajeB = function()	{
+	this.AtendidoMensajeB1 = function()	{
 		return new Evento(
 			tiempo,
+			"B1 atendió un mensaje",
 			"B atendió un mensaje",
+			HandlerAtendidoMensajeB,
+			datos);
+	};
+	
+	this.AtendidoMensajeB2 = function()	{
+		return new Evento(
+			tiempo,
+			"B2 atendió un mensaje",
 			"B atendió un mensaje",
 			HandlerAtendidoMensajeB,
 			datos);
