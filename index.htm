@@ -9,8 +9,9 @@
 <script src="distribuciones.js"></script>
 <script src="eventos.js"></script>
 <script src="simulacion.js"></script>
+<script src="app.js"></script>
 </head>
-<body>
+<body ng-controller="SimulacionCtrl">
 <div class="container">
 	<div class="well">
 	<h1>Simulación</h1>
@@ -36,25 +37,35 @@
 			<button class="form-control btn btn-success">Simular todo</button>
 		</div>
 	</div>
-	<h1>Probando {{CantidadRepeticiones}} {{MinutosSimulacion}} {{PausaMilis}}</h1>
 	<div class="row">
 		<div class="col-lg-4">
 			<h1>Simulación Actual</h1>
 			<ul>
-			<li>Reloj: 0
-			<li>Evento: Detenido
-			<li>Mensajes enviados: 0
-			<li>Mensajes rechazados: 0
+			<li>Reloj: {{SA.Reloj}}
+			<li>Evento: {{SA.Ejecutando.Nombre}}:{{SA.Ejecutando.Descripcion}}
+			<li>Mensajes enviados: {{SA.e.Enviados}}
+			<li>Mensajes rechazados: {{SA.e.Rechazados}}
 			</ul>
 			<table class="table table-hover">
 			<thead>
 			<tr><th>Servidor</th><th>Estado</th><th>Mensajes en cola</th></tr>
 			</thead>
 			<tbody>
-				<tr><td>Servidor 1</td><td>Desocupado</td><td>0</td></tr>
-				<tr><td>Servidor 2.1</td><td>Desocupado</td><td rowspan="2">0</td></tr>
-				<tr><td>Servidor 2.2</td><td>Desocupado</td></tr>
-				<tr><td>Servidor 3</td><td>Desocupado</td><td>0</td></tr>
+				<tr><td>Servidor 1</td>
+					<td>{{SA.e.Estados.A}}</td>
+					<td>{{SA.e.Colas.A.length}}</td>
+				</tr>
+				<tr><td>Servidor 2.1</td>
+					<td>{{SA.e.Estados.B1}}</td>
+					<td rowspan="2">{{SA.e.Colas.B.length}}</td>
+				</tr>
+				<tr><td>Servidor 2.2</td>
+					<td>{{SA.e.Estados.B2}}</td>
+				</tr>
+				<tr><td>Servidor 3</td>
+					<td>{{SA.e.Estados.C}}</td>
+					<td>{{SA.e.Colas.C.length}}</td>
+				</tr>
 			</tbody>
 			</table>
 		</div>
@@ -93,47 +104,36 @@
 			</tr>
 			</thead>
 			<tbody>
-			<tr>
-			<td>1</td>
-			<td>1</td>
-			<td>1</td>
-			<td>1</td>
-			<td>1</td>
-			<td>1</td>
-			<td>1</td>
-			<td>1</td>
-			<td>1</td>
-			<td>1</td>
-			<td>1</td>
-			<td>1</td>
-			<td>1</td>
-			<td>1</td>
-			<td>1</td>
-			<td>1</td>
-			<td>1</td>
-			<td>1</td>
-			<td>1</td>
+			<tr ng-repeat="e in Simulaciones">
+				<td>{{Simulaciones.indexOf(e)}}</td>
+			
+				<td>{{e.e.Enviados}}</td>
+				<td>{{e.e.Rechazados}}</td>
+				<td>{{e.e.NumTotal}}</td>
+			
+				<td>{{e.e.pOA}}</td>
+				<td>{{e.e.pOB1}}</td>
+				<td>{{e.e.pOB2}}</td>
+				<td>{{e.e.pOC}}</td>
+			
+				<td>{{e.e.pORA}}</td>
+				<td>{{e.e.pORB1}}</td>
+				<td>{{e.e.pORB2}}</td>
+				<td>{{e.e.pORC}}</td>
+			
+				<td>{{e.e.pMsgRechazado}}</td>
+				<td>{{e.e.TSistema}}</td>
+			
+				<td>{{e.e.DevolucionesB}}</td>
+				<td>{{e.e.DevolucionesC}}</td>
+			
+				<td>{{e.e.TiempoColas}}</td>
+				<td>{{e.e.TiempoTransmision}}</td>
+			
+				<td>{{e.e.PorcentajeProcesamiento}}</td>
 			</tr>
 			<tr>
 			<td>Promedio total</td>
-			<td>1</td>
-			<td>1</td>
-			<td>1</td>
-			<td>1</td>
-			<td>1</td>
-			<td>1</td>
-			<td>1</td>
-			<td>1</td>
-			<td>1</td>
-			<td>1</td>
-			<td>1</td>
-			<td>1</td>
-			<td>1</td>
-			<td>1</td>
-			<td>1</td>
-			<td>1</td>
-			<td>1</td>
-			<td>1</td>
 			</tr>
 			</tbody>
 		</table>

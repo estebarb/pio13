@@ -114,7 +114,7 @@ function Estadisticas(NumMsg, Reloj, TiempoComputo, TiempoEnSistema, Devolucione
 	this.TiempoEnSistema = TiempoEnSistema;
 	// Cantidad de devoluciones (B y C)
 	this.Devoluciones = Devoluciones;
-	// Cantidad de tiempo en colas (A, B y C)
+	// Cantidad de tiempo en colas
 	this.TiempoColas = TiempoColas;
 	// Cantidad de tiempo en transmisión
 	this.TiempoTransmision = TiempoTransmision;

@@ -264,7 +264,7 @@ function HandlerAtendidoMensajeC(estado, data){
 		msg = estado.Colas.C.shift();
 		
 		// Y actualizamos las estadísticas:
-		msg.TiempoColas.C += msg.HoraEvento;
+		msg.TiempoColas += msg.HoraEvento;
 		msg.HoraEvento = estado.Reloj;
 		
 		var ta = DistribucionExponencial(60/4);
@@ -309,7 +309,7 @@ function HandlerAtendidoMensajeB1(estado, data){
 		msg = estado.Colas.B.shift();
 		
 		// Y actualizamos las estadísticas:
-		msg.TiempoColas.B += msg.HoraEvento;
+		msg.TiempoColas += msg.HoraEvento;
 		msg.HoraEvento = estado.Reloj;
 		
 		var ta = DistribucionUniforme(12/60, 25/60);
@@ -354,7 +354,7 @@ function HandlerAtendidoMensajeB2(estado, data){
 		msg = estado.Colas.B.shift();
 		
 		// Y actualizamos las estadísticas:
-		msg.TiempoColas.B += msg.HoraEvento;
+		msg.TiempoColas += msg.HoraEvento;
 		msg.HoraEvento = estado.Reloj;
 		
 		var ta = DistribucionUniforme(12/60, 25/60);
@@ -404,7 +404,7 @@ function HandlerAtendidoMensajeA(estado, data){
 		evento = new FactoryEventos(
 			estado.Reloj + DistribucionUniforme(3/60, 5/60),
 			{mensaje: msg}
-			).RecibirMensajeB);
+			).RecibirMensajeB();
 	} else {
 		// El mensaje será devuelto a C
 		msg.Devoluciones.C++;
@@ -427,7 +427,7 @@ function HandlerAtendidoMensajeA(estado, data){
 		msg = estado.Colas.A.shift();
 		
 		// Y actualizamos las estadísticas:
-		msg.TiempoColas.A += msg.HoraEvento;
+		msg.TiempoColas += msg.HoraEvento;
 		msg.HoraEvento = estado.Reloj;
 		
 		var ta = DistribucionExponencial(10);
@@ -452,22 +452,22 @@ function HandlerAtendidoMensajeA(estado, data){
 function HandlerMetaEnviado(estado, data){
 	var estadisticas = estado.Estadisticas.Enviados;
 	var msg = data.mensaje;
-	estadisticas = ActualizarEstadisticas(estadisticas, msg);
+	estadisticas = EstadisticasMensaje(estadisticas, msg);
 	estado.Estadisticas.Enviados = estadisticas;
-	return estado;
+	return ActualizarEstadisticas(estado);
 }
 
 function HandlerMetaRechazado(estado, data){
 	var estadisticas = estado.Estadisticas.Rechazados;
 	var msg = data.mensaje;
-	estadisticas = ActualizarEstadisticas(estadisticas, msg);
+	estadisticas = EstadisticasMensaje(estadisticas, msg);
 	estado.Estadisticas.Rechazados = estadisticas;
-	return estado;
+	return ActualizarEstadisticas(estado);
 }
 
-// ActualizarEstatisticas(estadistica, mensaje)
+// EstadisticasMensaje(estadistica, mensaje)
 // Actualiza las estadisticas dadas según el mensaje.
-function ActualizarEstadisticas(e, m){
+function EstadisticasMensaje(e, m){
 	// Cantidad de mensajes
 	e.NumMsg++;
 	// Tiempo en la simulación
@@ -487,12 +487,86 @@ function ActualizarEstadisticas(e, m){
 	e.Devoluciones.C += m.Devoluciones.C;
 	
 	// Cantidad de tiempo en colas (A, B y C)
-	e.TiempoColas.A	+= m.TiempoColas.A;
-	e.TiempoColas.B	+= m.TiempoColas.B;
-	e.TiempoColas.C	+= m.TiempoColas.C;
+	e.TiempoColas	+= m.TiempoColas;
+	//e.TiempoColas.B	+= m.TiempoColas.B;
+	//e.TiempoColas.C	+= m.TiempoColas.C;
 	
 	// Cantidad de tiempo en transmisión
 	e.TiempoTransmision += m.TiempoTransmision;
+	
+	// Porcentaje de procesamiento por mensaje:
+	e.ProcesamientoPorMensaje += (m.TiempoProcesamiento.A +
+							m.TiempoProcesamiento.B1 +
+							m.TiempoProcesamiento.B2 +
+							m.TiempoProcesamiento.C) /
+							(m.HoraEvento - m.HoraCreacion);
+	
+	return e;
+}
+
+// ActualizarEstadisticas(estado)
+// Actualiza las estadisticas acumuladas del sistema,
+// para que sean facilmente consumibles por Angular.js
+function ActualizarEstadisticas(e){
+	// Cantidad de mensajes
+	e.e.Enviados = e.Estadisticas.Enviados.NumMsg;
+	e.e.Rechazados = e.Estadisticas.Rechazados.NumMsg;
+	e.e.NumTotal = e.e.Enviados + e.e.Rechazados;
+	
+	// Porcentaje de ocupación
+	e.e.pOA = (e.Estadisticas.Enviados.TiempoComputo.A +
+			 e.Estadisticas.Rechazados.TiempoComputo.A) 
+			 / e.Reloj;
+	e.e.pOB1 = (e.Estadisticas.Enviados.TiempoComputo.B1 +
+			 e.Estadisticas.Rechazados.TiempoComputo.B1) 
+			 / e.Reloj;
+	e.e.pOB2 = (e.Estadisticas.Enviados.TiempoComputo.B2 +
+			 e.Estadisticas.Rechazados.TiempoComputo.B2) 
+			 / e.Reloj;
+	e.e.pOC = (e.Estadisticas.Enviados.TiempoComputo.C +
+			 e.Estadisticas.Rechazados.TiempoComputo.C) 
+			 / e.Reloj;
+			 
+	// Porcentaje de ocupación en mensajes rechazados
+	e.e.pORA = e.Estadisticas.Rechazados.TiempoComputo.A
+			 / e.Reloj;
+	e.e.pORB1 = e.Estadisticas.Rechazados.TiempoComputo.B1
+			 / e.Reloj;
+	e.e.pORB2 = e.Estadisticas.Rechazados.TiempoComputo.B2
+			 / e.Reloj;
+	e.e.pORC = e.Estadisticas.Rechazados.TiempoComputo.C
+			 / e.Reloj;
+			 
+	// Porcentaje de mensajes rechazados
+	e.e.pMsgRechazado = e.e.Rechazados / e.e.NumTotal;
+	
+	// Tiempo promedio en el sistema por mensaje
+	e.e.TSistema = (e.Estadisticas.Enviados.TiempoEnSistema +
+					e.Estadisticas.Rechazados.TiempoEnSistema)
+					/ e.e.NumTotal;
+
+	// Promedio de devoluciones
+	e.e.DevolucionesB = (e.Estadisticas.Enviados.Devoluciones.B +
+					e.Estadisticas.Rechazados.Devoluciones.B)
+					/ e.e.NumTotal; 
+	e.e.DevolucionesC = (e.Estadisticas.Enviados.Devoluciones.C +
+					e.Estadisticas.Rechazados.Devoluciones.C)
+					/ e.e.NumTotal;
+					
+	// Tiempo promedio en colas
+	e.e.TiempoColas = (e.Estadisticas.Enviados.TiempoColas +
+					e.Estadisticas.Rechazados.TiempoColas)
+					/ e.e.NumTotal;
+					
+	// Tiempo promedio en transmisión
+	e.e.TiempoTransmision = (e.Estadisticas.Enviados.TiempoTransmision +
+					e.Estadisticas.Rechazados.TiempoTransmision)
+					/ e.e.NumTotal;
+	
+	// Porcentaje de tiempo en procesamiento
+	// por mensaje
+	e.e.PorcentajeProcesamiento = e.Estadisticas.ProcesamientoPorMensaje /
+					e.e.NumTotal;
 	
 	return e;
 }
