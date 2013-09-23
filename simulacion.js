@@ -45,7 +45,7 @@ function Evento(tiempo, nombre, descripcion, lambda, data){
 // Tiempo en colas {A:0, B:0, C:0}
 // Tiempo en transmisión {A:0, B:0, C:0}
 // Tiempo en procesamiento {A:0, B:0, C:0}
-function Mensaje(HoraCreacion, HoraEvento, Devoluciones, PCanterior, TiempoColas, TiempoTransmisión, TiempoProcesamiento){
+function Mensaje(HoraCreacion, HoraEvento, Devoluciones, PCanterior, TiempoColas, TiempoTransmision, TiempoProcesamiento){
 	// Hora de creación del mensaje actual
 	this.HoraCreacion = HoraCreacion;
 	
@@ -103,7 +103,7 @@ function CrearMensaje(estado){
 // Para poder llevar un control de las estadísticas se usará
 // un objeto como el siguiente, separando las estadísticas
 // para los mensajes aceptados o rechazados.
-function Estadisticas(NumMsg, Reloj, TiempoComputo, TiempoEnSistema, Devoluciones, TiempoColas, TiempoTransmision, PorcentajeProcesamiento){
+function Estadisticas(NumMsg, Reloj, TiempoComputo, TiempoEnSistema, Devoluciones, TiempoColas, TiempoTransmision, PorcentajeProcesamiento, ProcesamientoPorMensaje){
 	// Cantidad de mensajes procesados
 	this.NumMsg = NumMsg;
 	// Reloj del último evento
@@ -120,6 +120,8 @@ function Estadisticas(NumMsg, Reloj, TiempoComputo, TiempoEnSistema, Devolucione
 	this.TiempoTransmision = TiempoTransmision;
 	// Porcentaje procesamiento
 	this.PorcentajeProcesamiento = PorcentajeProcesamiento;
+	// Procesamiento por mensaje
+	this.ProcesamientoPorMensaje = ProcesamientoPorMensaje;
 }
 
 // CrearEstadisticas
@@ -131,6 +133,7 @@ function CrearEstadisticas(){
 		{A:0, B1: 0, B2: 0, C:0},
 		0,
 		{B: 0, C: 0},
+		0,
 		0,
 		0,
 		0

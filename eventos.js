@@ -508,6 +508,7 @@ function EstadisticasMensaje(e, m){
 // Actualiza las estadisticas acumuladas del sistema,
 // para que sean facilmente consumibles por Angular.js
 function ActualizarEstadisticas(e){
+	e.e = {};
 	// Cantidad de mensajes
 	e.e.Enviados = e.Estadisticas.Enviados.NumMsg;
 	e.e.Rechazados = e.Estadisticas.Rechazados.NumMsg;

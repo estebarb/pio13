@@ -6,6 +6,10 @@ function SimulacionCtrl($scope){
 	$scope.Simulaciones = [];
 	$scope.SA = {};
 	
+	$scope.MinutosSimulacion = 10;
+	$scope.CantidadRepeticiones = 1;
+	$scope.PausaMilis = 500;
+	
 	$scope.Reiniciar = function(){
 		// Inicializa los valores de la simulación
 		$scope.Simulaciones = [];
@@ -13,7 +17,7 @@ function SimulacionCtrl($scope){
 		$scope.terminar = true;
 	};
 	
-	$scope.Pausar = function(){
+	$scope.Detener = function(){
 		$scope.terminar = true;
 	};
 	
@@ -34,8 +38,8 @@ function SimulacionCtrl($scope){
 				});
 			// Se insertan los primeros dos eventos
 			var eveB, eveC;
-			eveB = FactoryEventos(0, null).CrearMensajeB();
-			eveC = FactoryEventos(0, null).CrearMensajeC();
+			eveB = new FactoryEventos(0, null).CrearMensajeB();
+			eveC = new FactoryEventos(0, null).CrearMensajeC();
 			e = PushEvent(eveB, e);
 			e = PushEvent(eveC, e);
 			
@@ -62,7 +66,10 @@ function SimulacionCtrl($scope){
 		
 		// Si el usuario no ha presionado pausar entonces sigue...
 		if(! $scope.terminar){
-			setTimeout($scope.SimularPaso(repeticiones, maxminutos),
+			setTimeout(function(){
+				$scope.SimularPaso(repeticiones, maxminutos);
+				console.log("corre");
+				},
 				$scope.PausaMilis);
 		}
 	};
