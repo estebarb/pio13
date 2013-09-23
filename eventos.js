@@ -28,14 +28,14 @@
 // (DONE) Se crea un mensaje para B/2
 // (DONE) Se crea un mensaje para C/3
 // Recibir mensaje
-// (TODO) Se recibe un mensaje en A/1
-// (TODO) Se recibe un mensaje en B/2
-// (TODO) Se recibe un mensaje en C/3
+// (DONE) Se recibe un mensaje en A/1
+// (DONE) Se recibe un mensaje en B/2
+// (DONE) Se recibe un mensaje en C/3
 // Se atendió un mensaje
-// (TODO) Se atendió un mensaje en A/1
-// (TODO) Se atendió un mensaje en B/2 CPU 1
-// (TODO) Se atendió un mensaje en B/2 CPU 2
-// (TODO) Se atendió un mensaje en C/3
+// (DONE) Se atendió un mensaje en A/1
+// (DONE) Se atendió un mensaje en B/2 CPU 1
+// (DONE) Se atendió un mensaje en B/2 CPU 2
+// (DONE) Se atendió un mensaje en C/3
 // Metaeventos (actualizan estadísticas):
 // (TODO) Mensaje RECHAZADO
 // (TODO) Mensaje ENVIADO
@@ -125,7 +125,7 @@ function HandlerCrearMensajeC(estado, data){
 function HandlerRecibirMensajeC(estado, data){
 	var msg = data.mensaje;
 	// Se actualizan las estadísticas de transmisión
-	msg.TiempoTransmision.C += DeltaTiempo(estado, msg);
+	msg.TiempoTransmision += DeltaTiempo(estado, msg);
 	// Se guarda la hora de encolamiento:
 	msg.HoraEvento = estado.Reloj;
 	
@@ -154,7 +154,7 @@ function HandlerRecibirMensajeC(estado, data){
 function HandlerRecibirMensajeB(estado, data){
 	var msg = data.mensaje;
 	// Se actualizan las estadísticas de transmisión
-	msg.TiempoTransmision.B += DeltaTiempo(estado, msg);
+	msg.TiempoTransmision += DeltaTiempo(estado, msg);
 	// Se guarda la hora de encolamiento:
 	msg.HoraEvento = estado.Reloj;
 	
@@ -195,7 +195,7 @@ function HandlerRecibirMensajeB(estado, data){
 function HandlerRecibirMensajeA(estado, data){
 	var msg = data.mensaje;
 	// Se actualizan las estadísticas de transmisión
-	msg.TiempoTransmision.A += DeltaTiempo(estado, msg);
+	msg.TiempoTransmision += DeltaTiempo(estado, msg);
 	// Se guarda la hora de encolamiento:
 	msg.HoraEvento = estado.Reloj;
 	
@@ -444,6 +444,58 @@ function HandlerAtendidoMensajeA(estado, data){
 }
 
 //////////////////////////////////////////////////////////////////
+
+// Los siguientes metaeventos actualizan las estadísticas
+// luego de que un mensaje es enviado al cliente
+// o bien rechazado por completo.
+
+function HandlerMetaEnviado(estado, data){
+	var estadisticas = estado.Estadisticas.Enviados;
+	var msg = data.mensaje;
+	estadisticas = ActualizarEstadisticas(estadisticas, msg);
+	estado.Estadisticas.Enviados = estadisticas;
+	return estado;
+}
+
+function HandlerMetaRechazado(estado, data){
+	var estadisticas = estado.Estadisticas.Rechazados;
+	var msg = data.mensaje;
+	estadisticas = ActualizarEstadisticas(estadisticas, msg);
+	estado.Estadisticas.Rechazados = estadisticas;
+	return estado;
+}
+
+// ActualizarEstatisticas(estadistica, mensaje)
+// Actualiza las estadisticas dadas según el mensaje.
+function ActualizarEstadisticas(e, m){
+	// Cantidad de mensajes
+	e.NumMsg++;
+	// Tiempo en la simulación
+	e.Reloj = Math.max(e.Reloj, m.HoraEvento);
+
+	// Total de tiempo haciendo cómputo (por CPU)
+	e.TiempoComputo.A	+= m.TiempoProcesamiento.A;
+	e.TiempoComputo.B1	+= m.TiempoProcesamiento.B1;
+	e.TiempoComputo.B2	+= m.TiempoProcesamiento.B2;
+	e.TiempoComputo.C	+= m.TiempoProcesamiento.C;
+	
+	// Total de tiempo en el sistema
+	e.TiempoEnSistema += m.HoraEvento - m.HoraCreacion;
+	
+	// Cantidad de devoluciones (B y C)
+	e.Devoluciones.B += m.Devoluciones.B;
+	e.Devoluciones.C += m.Devoluciones.C;
+	
+	// Cantidad de tiempo en colas (A, B y C)
+	e.TiempoColas.A	+= m.TiempoColas.A;
+	e.TiempoColas.B	+= m.TiempoColas.B;
+	e.TiempoColas.C	+= m.TiempoColas.C;
+	
+	// Cantidad de tiempo en transmisión
+	e.TiempoTransmision += m.TiempoTransmision;
+	
+	return e;
+}
 
 
 //////////////////////////////////////////////////////////////////

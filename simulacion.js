@@ -104,12 +104,19 @@ function CrearMensaje(estado){
 // un objeto como el siguiente, separando las estadísticas
 // para los mensajes aceptados o rechazados.
 function Estadisticas(NumMsg, Reloj, TiempoComputo, TiempoEnSistema, Devoluciones, TiempoColas, TiempoTransmision){
+	// Cantidad de mensajes procesados
 	this.NumMsg = NumMsg;
+	// Reloj del último evento
 	this.Reloj = Reloj;
+	// Total de tiempo haciendo cómputo (por CPU)
 	this.TiempoComputo = TiempoComputo;
+	// Total de tiempo en el sistema
 	this.TiempoEnSistema = TiempoEnSistema;
+	// Cantidad de devoluciones (B y C)
 	this.Devoluciones = Devoluciones;
+	// Cantidad de tiempo en colas (A, B y C)
 	this.TiempoColas = TiempoColas;
+	// Cantidad de tiempo en transmisión
 	this.TiempoTransmision = TiempoTransmision;
 }
 
