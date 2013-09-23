@@ -82,7 +82,7 @@ function CrearMensaje(estado){
 		0,					// PC anterior
 		{A:0, B: 0, C: 0},	// T. Colas
 		{A:0, B: 0, C: 0},	// T. Transmisión
-		{A:0, B: 0, C: 0}	// T. Procesamiento
+		{A:0, B1: 0, B2: 0, C: 0}	// T. Procesamiento
 		);
 }
 

@@ -125,7 +125,7 @@ function HandlerCrearMensajeC(estado, data){
 function HandlerRecibirMensajeC(estado, data){
 	var msg = data.mensaje;
 	// Se actualizan las estadísticas de transmisión
-	msg.TiempoTransmision.C += DeltaTiempo(estado, msg)
+	msg.TiempoTransmision.C += DeltaTiempo(estado, msg);
 	// Se guarda la hora de encolamiento:
 	msg.HoraEvento = estado.Reloj;
 	
@@ -154,7 +154,7 @@ function HandlerRecibirMensajeC(estado, data){
 function HandlerRecibirMensajeB(estado, data){
 	var msg = data.mensaje;
 	// Se actualizan las estadísticas de transmisión
-	msg.TiempoTransmision.B += DeltaTiempo(estado, msg)
+	msg.TiempoTransmision.B += DeltaTiempo(estado, msg);
 	// Se guarda la hora de encolamiento:
 	msg.HoraEvento = estado.Reloj;
 	
@@ -195,7 +195,7 @@ function HandlerRecibirMensajeB(estado, data){
 function HandlerRecibirMensajeA(estado, data){
 	var msg = data.mensaje;
 	// Se actualizan las estadísticas de transmisión
-	msg.TiempoTransmision.A += DeltaTiempo(estado, msg)
+	msg.TiempoTransmision.A += DeltaTiempo(estado, msg);
 	// Se guarda la hora de encolamiento:
 	msg.HoraEvento = estado.Reloj;
 	
@@ -221,6 +221,227 @@ function HandlerRecibirMensajeA(estado, data){
 }
 
 //////////////////////////////////////////////////////////////////
+
+// Atiende un mensaje en PC C
+function HandlerAtendidoMensajeC(estado, data){
+	var msg = data.mensaje;
+	// Se actualizan las estadísticas:
+	msg.TiempoProcesamiento.C += DeltaTiempo(estado, msg);
+	// Se guarda la hora actual:
+	msg.HoraEvento = estado.Reloj;
+	// Y la PC actual:
+	msg.PCanterior = 3;
+	
+	// En C el 80% de los mensajes son rechazados por completo:
+	var rechazado = DistribucionMoneda(0.80);
+	if(rechazado){
+		// En este caso se crea un meta evento
+		// MetaRechazado para que recolecte
+		// las estadísticas.
+		var evento = new FactoryEventos(
+			estado.Reloj,
+			{mensaje: msg}
+			).MetaRechazado();
+		estado = PushEvent(evento, estado);
+	} else {
+		// Sino enviamos el mensaje a PC A,
+		// quien lo recibirá en el futuro...
+		var evento = new FactoryEventos(
+			estado.Reloj + DistribucionX600(),
+			{mensaje: msg}
+			).RecibirMensajeA();
+		estado = PushEvent(evento, estado);
+	}
+	// Y estamos libres... por ahora
+	estado.Estados.C = false;
+	
+	// Ahora que se atendió un mensaje el PC
+	// está libre para atender a un eventual
+	// mensaje en la cola:
+	if(estado.Colas.C.length > 0){
+		estado.Estados.C = true;
+		// (cons msg estado.Colas.C) = estado.Colas.C
+		msg = estado.Colas.C.shift();
+		
+		// Y actualizamos las estadísticas:
+		msg.TiempoColas.C += msg.HoraEvento;
+		msg.HoraEvento = estado.Reloj;
+		
+		var ta = DistribucionExponencial(60/4);
+		// Se configura el evento "mensaje atendido por C":
+		var evento = new FactoryEventos(
+			estado.Reloj + ta,
+			{mensaje: msg}
+			).AtendidoMensajeC();
+		// Y se programa el evento:
+		estado = PushEvent(evento, estado);
+	}
+	
+	return estado;
+}
+
+// Atiende un mensaje en PC B1
+function HandlerAtendidoMensajeB1(estado, data){
+	var msg = data.mensaje;
+	// Se actualizan las estadísticas:
+	msg.TiempoProcesamiento.B1 += DeltaTiempo(estado, msg);
+	// Se guarda la hora actual:
+	msg.HoraEvento = estado.Reloj;
+	// Y la PC actual:
+	msg.PCanterior = 2;
+	
+	// Enviamos el mensaje a PC A,
+	// quien lo recibirá en el futuro...
+	var evento = new FactoryEventos(
+		estado.Reloj + DistribucionX600(),
+		{mensaje: msg}
+		).RecibirMensajeA();
+	estado = PushEvent(evento, estado);
+	// Y estamos libres... por ahora
+	estado.Estados.B1 = false;
+	
+	// Ahora que se atendió un mensaje el PC
+	// está libre para atender a un eventual
+	// mensaje en la cola:
+	if(estado.Colas.B.length > 0){
+		estado.Estados.B1 = true;
+		// (cons msg estado.Colas.B) = estado.Colas.B
+		msg = estado.Colas.B.shift();
+		
+		// Y actualizamos las estadísticas:
+		msg.TiempoColas.B += msg.HoraEvento;
+		msg.HoraEvento = estado.Reloj;
+		
+		var ta = DistribucionUniforme(12/60, 25/60);
+		// Se configura el evento "mensaje atendido por B":
+		var evento = new FactoryEventos(
+			estado.Reloj + ta,
+			{mensaje: msg}
+			).AtendidoMensajeB1();
+		// Y se programa el evento:
+		estado = PushEvent(evento, estado);
+	}
+	
+	return estado;
+}
+
+// Atiende un mensaje en PC B2
+function HandlerAtendidoMensajeB2(estado, data){
+	var msg = data.mensaje;
+	// Se actualizan las estadísticas:
+	msg.TiempoProcesamiento.B2 += DeltaTiempo(estado, msg);
+	// Se guarda la hora actual:
+	msg.HoraEvento = estado.Reloj;
+	// Y la PC actual:
+	msg.PCanterior = 2;
+	
+	// Enviamos el mensaje a PC A,
+	// quien lo recibirá en el futuro...
+	var evento = new FactoryEventos(
+		estado.Reloj + DistribucionX600(),
+		{mensaje: msg}
+		).RecibirMensajeA();
+	estado = PushEvent(evento, estado);
+	// Y estamos libres... por ahora
+	estado.Estados.B2 = false;
+	
+	// Ahora que se atendió un mensaje el PC
+	// está libre para atender a un eventual
+	// mensaje en la cola:
+	if(estado.Colas.B.length > 0){
+		estado.Estados.B2 = true;
+		// (cons msg estado.Colas.B) = estado.Colas.B
+		msg = estado.Colas.B.shift();
+		
+		// Y actualizamos las estadísticas:
+		msg.TiempoColas.B += msg.HoraEvento;
+		msg.HoraEvento = estado.Reloj;
+		
+		var ta = DistribucionUniforme(12/60, 25/60);
+		// Se configura el evento "mensaje atendido por B":
+		var evento = new FactoryEventos(
+			estado.Reloj + ta,
+			{mensaje: msg}
+			).AtendidoMensajeB2();
+		// Y se programa el evento:
+		estado = PushEvent(evento, estado);
+	}
+	
+	return estado;
+}
+
+// Atiende un mensaje en PC A
+function HandlerAtendidoMensajeA(estado, data){
+	var msg = data.mensaje;
+	// Se actualizan las estadísticas:
+	msg.TiempoProcesamiento.A += DeltaTiempo(estado, msg);
+	// Se guarda la hora actual:
+	msg.HoraEvento = estado.Reloj;
+	
+	var anterior = msg.PCanterior;
+	msg.PCanterior = 1;
+	
+	// En A usualmente rechaza el 20% de los mensajes de B
+	// y el 50% de los mensajes de C.
+	var rechazado = 0;
+	if(2 == anterior){
+		rechazado = DistribucionMoneda(0.20);
+	} else {
+		rechazado = DistribucionMoneda(0.50);
+	}
+	
+	// Hay tres opciones:
+	var evento;
+	if(!rechazado){
+		// El mensaje será enviado al cliente
+		evento = new FactoryEventos(
+			estado.Reloj,
+			{mensaje: msg}
+			).MetaEnviado();		
+	} else if (2 == anterior){
+		// El mensaje será devuelto a B
+		msg.Devoluciones.B++;
+		evento = new FactoryEventos(
+			estado.Reloj + DistribucionUniforme(3/60, 5/60),
+			{mensaje: msg}
+			).RecibirMensajeB);
+	} else {
+		// El mensaje será devuelto a C
+		msg.Devoluciones.C++;
+		evento = new FactoryEventos(
+			estado.Reloj + DistribucionUniforme(3/60, 5/60),
+			{mensaje: msg}
+			).RecibirMensajeC();
+	}
+	estado = PushEvent(evento, estado);
+	
+	// Y estamos libres... por ahora
+	estado.Estados.A = false;
+	
+	// Ahora que se atendió un mensaje el PC
+	// está libre para atender a un eventual
+	// mensaje en la cola:
+	if(estado.Colas.A.length > 0){
+		estado.Estados.A = true;
+		// (cons msg estado.Colas.A) = estado.Colas.A
+		msg = estado.Colas.A.shift();
+		
+		// Y actualizamos las estadísticas:
+		msg.TiempoColas.A += msg.HoraEvento;
+		msg.HoraEvento = estado.Reloj;
+		
+		var ta = DistribucionExponencial(10);
+		// Se configura el evento "mensaje atendido por A":
+		var evento = new FactoryEventos(
+			estado.Reloj + ta,
+			{mensaje: msg}
+			).AtendidoMensajeA();
+		// Y se programa el evento:
+		estado = PushEvent(evento, estado);
+	}
+	
+	return estado;
+}
 
 //////////////////////////////////////////////////////////////////
 
@@ -309,7 +530,7 @@ function FactoryEventos(tiempo, datos){
 			tiempo,
 			"B1 atendió un mensaje",
 			"B atendió un mensaje",
-			HandlerAtendidoMensajeB,
+			HandlerAtendidoMensajeB1,
 			datos);
 	};
 	
@@ -318,7 +539,7 @@ function FactoryEventos(tiempo, datos){
 			tiempo,
 			"B2 atendió un mensaje",
 			"B atendió un mensaje",
-			HandlerAtendidoMensajeB,
+			HandlerAtendidoMensajeB2,
 			datos);
 	};
 	
