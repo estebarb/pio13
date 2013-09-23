@@ -42,8 +42,8 @@ function Evento(tiempo, nombre, descripcion, lambda, data){
 // HoraEvento
 // Devoluciones {B:0, C:0}
 // PC Anterior (puede ser la 0, 1, 2 o 3)
-// Tiempo en colas {A:0, B:0, C:0}
-// Tiempo en transmisión {A:0, B:0, C:0}
+// Tiempo en colas 0
+// Tiempo en transmisión 0
 // Tiempo en procesamiento {A:0, B:0, C:0}
 function Mensaje(HoraCreacion, HoraEvento, Devoluciones, PCanterior, TiempoColas, TiempoTransmision, TiempoProcesamiento){
 	// Hora de creación del mensaje actual
@@ -80,8 +80,8 @@ function CrearMensaje(estado){
 		estado.Reloj,		// Hora evento
 		{B: 0, C: 0},		// Devoluciones
 		0,					// PC anterior
-		{A:0, B: 0, C: 0},	// T. Colas
-		{A:0, B: 0, C: 0},	// T. Transmisión
+		0,	// T. Colas
+		0,	// T. Transmisión
 		{A:0, B1: 0, B2: 0, C: 0}	// T. Procesamiento
 		);
 }
@@ -187,6 +187,28 @@ function Estado(Reloj, Colas, Eventos, Estados, Estadisticas){
 	// Estadisticas = {Enviados: new Estadisticas(...), 
 	//                 Rechazados: new Estadisticas(...)}
 	this.Estadisticas = Estadisticas;
+	
+	// Y estas son las estadísticas acumuladas:
+	this.e = { 
+		Enviados: 0,
+		Rechazados: 0,
+		NumTotal: 0,
+		pOA: 0,
+		pOB1: 0,
+		pOB2: 0,
+		pOC: 0,
+		pORA: 0,
+		pORB1: 0,
+		pORB2: 0,
+		pORC: 0,
+		pMsgRechazado: 0,
+		TSistema: 0,
+		DevolucionesB: 0,
+		DevolucionesC: 0,
+		TiempoColas: 0,
+		TiempoTransmision: 0,
+		PorcentajeProcesamiento: 0
+	};
 }
 
 //////////////////////////////////////////////////////////////////
@@ -218,7 +240,8 @@ function SimulationStep(estado){
 	
 	// Ejecuta el evento actual y retorna
 	// el nuevo estado del sistema.
-	return evento.Lambda(estado, evento.Data);
+	estado = evento.Lambda(estado, evento.Data);
+	return estado;
 }
 
 //////////////////////////////////////////////////////////////////
@@ -278,15 +301,13 @@ function PeekEvent(estado){
 // Retorna:
 //   Un nuevo estado sin el primer evento.
 function PopEvent(estado){
-	var lista = estado.Eventos;
 	// Como la lista es construida usando
 	// PushEvent estamos seguros que está
 	// ordenada por tiempo de ejecución
 	// del evento.
 	// Por lo tanto, basta con eliminar 
 	// el primer elemento.
-	lista.shift();
-	estado.Eventos = lista;
+	estado.Eventos.shift();
 	return estado;
 }
 

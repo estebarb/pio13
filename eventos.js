@@ -37,8 +37,8 @@
 // (DONE) Se atendió un mensaje en B/2 CPU 2
 // (DONE) Se atendió un mensaje en C/3
 // Metaeventos (actualizan estadísticas):
-// (TODO) Mensaje RECHAZADO
-// (TODO) Mensaje ENVIADO
+// (DONE) Mensaje RECHAZADO
+// (DONE) Mensaje ENVIADO
 
 //////////////////////////////////////////////////////////////////
 // El flujo de eventos es algo así:
@@ -264,7 +264,7 @@ function HandlerAtendidoMensajeC(estado, data){
 		msg = estado.Colas.C.shift();
 		
 		// Y actualizamos las estadísticas:
-		msg.TiempoColas += msg.HoraEvento;
+		msg.TiempoColas += DeltaTiempo(estado, msg);
 		msg.HoraEvento = estado.Reloj;
 		
 		var ta = DistribucionExponencial(60/4);
@@ -309,7 +309,7 @@ function HandlerAtendidoMensajeB1(estado, data){
 		msg = estado.Colas.B.shift();
 		
 		// Y actualizamos las estadísticas:
-		msg.TiempoColas += msg.HoraEvento;
+		msg.TiempoColas += DeltaTiempo(estado, msg);
 		msg.HoraEvento = estado.Reloj;
 		
 		var ta = DistribucionUniforme(12/60, 25/60);
@@ -354,7 +354,7 @@ function HandlerAtendidoMensajeB2(estado, data){
 		msg = estado.Colas.B.shift();
 		
 		// Y actualizamos las estadísticas:
-		msg.TiempoColas += msg.HoraEvento;
+		msg.TiempoColas += DeltaTiempo(estado, msg);
 		msg.HoraEvento = estado.Reloj;
 		
 		var ta = DistribucionUniforme(12/60, 25/60);
@@ -427,7 +427,7 @@ function HandlerAtendidoMensajeA(estado, data){
 		msg = estado.Colas.A.shift();
 		
 		// Y actualizamos las estadísticas:
-		msg.TiempoColas += msg.HoraEvento;
+		msg.TiempoColas += DeltaTiempo(estado, msg);
 		msg.HoraEvento = estado.Reloj;
 		
 		var ta = DistribucionExponencial(10);
@@ -508,7 +508,6 @@ function EstadisticasMensaje(e, m){
 // Actualiza las estadisticas acumuladas del sistema,
 // para que sean facilmente consumibles por Angular.js
 function ActualizarEstadisticas(e){
-	e.e = {};
 	// Cantidad de mensajes
 	e.e.Enviados = e.Estadisticas.Enviados.NumMsg;
 	e.e.Rechazados = e.Estadisticas.Rechazados.NumMsg;
@@ -566,7 +565,8 @@ function ActualizarEstadisticas(e){
 	
 	// Porcentaje de tiempo en procesamiento
 	// por mensaje
-	e.e.PorcentajeProcesamiento = e.Estadisticas.ProcesamientoPorMensaje /
+	e.e.PorcentajeProcesamiento = (e.Estadisticas.Enviados.ProcesamientoPorMensaje +
+					e.Estadisticas.Rechazados.ProcesamientoPorMensaje) /
 					e.e.NumTotal;
 	
 	return e;
@@ -686,7 +686,7 @@ function FactoryEventos(tiempo, datos){
 	
 	this.MetaEnviado = function()	{
 		return new Evento(
-			0,
+			tiempo,
 			"Mensaje enviado",
 			"Se envió el mensaje exitosamente",
 			HandlerMetaEnviado,
@@ -695,7 +695,7 @@ function FactoryEventos(tiempo, datos){
 	
 	this.MetaRechazado = function()	{
 		return new Evento(
-			0,
+			tiempo,
 			"Mensaje rechazado",
 			"El abortó el envío de un mensaje",
 			HandlerMetaRechazado,

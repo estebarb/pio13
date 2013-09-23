@@ -53,19 +53,19 @@
 			</thead>
 			<tbody>
 				<tr><td>Servidor 1</td>
-					<td>{{SA.e.Estados.A}}</td>
-					<td>{{SA.e.Colas.A.length}}</td>
+					<td>{{SA.Estados.A}}</td>
+					<td>{{SA.Colas.A.length}}</td>
 				</tr>
 				<tr><td>Servidor 2.1</td>
-					<td>{{SA.e.Estados.B1}}</td>
+					<td>{{SA.Estados.B1}}</td>
 					<td rowspan="2">{{SA.e.Colas.B.length}}</td>
 				</tr>
 				<tr><td>Servidor 2.2</td>
-					<td>{{SA.e.Estados.B2}}</td>
+					<td>{{SA.Estados.B2}}</td>
 				</tr>
 				<tr><td>Servidor 3</td>
-					<td>{{SA.e.Estados.C}}</td>
-					<td>{{SA.e.Colas.C.length}}</td>
+					<td>{{SA.Estados.C}}</td>
+					<td>{{SA.Colas.C.length}}</td>
 				</tr>
 			</tbody>
 			</table>
@@ -76,6 +76,7 @@
 		<table class="table table-hover table-bordered">
 			<thead>
 			<tr>
+			<th></th>
 			<th></th>
 			<th colspan="3">Mensajes</th>
 			<th colspan="4">% ocupación</th>
@@ -89,6 +90,7 @@
 			</tr>
 			<tr>
 			<th>Simulación</th>
+						<th>Reloj</th>
 			<th>Enviados</th>
 			<th>Rechazados</th>
 			<th>Total</th>
@@ -107,7 +109,7 @@
 			<tbody>
 			<tr ng-repeat="e in Simulaciones">
 				<td>{{Simulaciones.indexOf(e)}}</td>
-			
+			<td>{{e.Reloj}}</td>
 				<td>{{e.e.Enviados}}</td>
 				<td>{{e.e.Rechazados}}</td>
 				<td>{{e.e.NumTotal}}</td>
