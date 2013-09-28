@@ -104,9 +104,90 @@ function SimulacionCtrl($scope){
 				$scope.Simulaciones.pop();
 				$scope.Simulaciones.push(e);
 				$scope.SA = e;
+				$scope.$apply();
 			}
 			
 			e.Finished = true;			
 		};
 	};
+	
+	$scope.SimularBootstrap = function(pausa, repeticiones, tiempo){
+		// ¿Ya se acabaron las repeticiones?
+		if (repeticiones <= 0){
+			return;
+		}
+		var e = new Estado(
+			0, //Reloj
+			{A: [], B: [], C:[]}, //Colas
+			[], //Eventos
+			{A:false, B1: false, B2: false, C:false}, //Estados
+			{
+				Enviados: CrearEstadisticas(), 
+				Rechazados: CrearEstadisticas()
+			});
+		// Se insertan los primeros dos eventos
+		var eveB, eveC;
+		eveB = new FactoryEventos(0, null).CrearMensajeB();
+		eveC = new FactoryEventos(0, null).CrearMensajeC();
+		e = PushEvent(eveB, e);
+		e = PushEvent(eveC, e);
+		
+		// Hace binding entre el estado y la GUI
+		$scope.Simulaciones.push(e);
+		$scope.SA = e;
+		$scope.$apply();
+		
+		// Llama al siguiente paso:
+		window.setTimeout(
+			function(){
+				$scope.SimularResto(pausa, repeticiones, tiempo)
+			},
+			pausa);
+	}
+	
+	$scope.SimularResto = function(pausa, repeticiones, tiempo){
+		e = $scope.SA;
+		// ¿Ya se acabó la simulación actual?
+		if (e.Finished){
+			window.setTimeout(
+				function(){
+					$scope.SimularResto(pausa, repeticiones-1, tiempo)
+				},
+				pausa);
+		} else {
+			// Ejecutamos un paso	
+			e = SimulationStep(e);
+		
+			// Cambiamos el estado según ya se 
+			// haya terminado la simulación.
+			// (Los eventos superan el tiempo
+			// límite)
+			e.Finished = PeekEvent(e).Tiempo > tiempo;
+		
+			// Actualiza Modelo
+			$scope.Simulaciones.pop();
+			$scope.Simulaciones.push(e);
+			$scope.SA = e;
+			$scope.$apply();		
+		
+			// Y hacemos una llamada "recursiva"
+			window.setTimeout(
+				function(){
+					$scope.SimularResto(pausa, repeticiones, tiempo)
+				},
+				pausa);
+		}
+	}
+	
+	$scope.Simular2 = function(){
+		// Borra el estado del sistema...
+		$scope.Simulaciones = [];
+		$scope.SA = null;
+		// Y comienza la simulación:
+		$scope.SimularBootstrap(
+				$scope.PausaMilis,
+				$scope.CantidadRepeticiones,
+				$scope.MinutosSimulacion
+				);
+	}
 }
