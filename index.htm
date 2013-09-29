@@ -60,7 +60,7 @@
 				</tr>
 				<tr><td>Servidor 2.1</td>
 					<td>{{SA.Estados.B1}}</td>
-					<td rowspan="2">{{SA.e.Colas.B.length}}</td>
+					<td rowspan="2">{{SA.Colas.B.length}}</td>
 				</tr>
 				<tr><td>Servidor 2.2</td>
 					<td>{{SA.Estados.B2}}</td>
@@ -82,60 +82,57 @@
 			<th></th>
 			<th colspan="3">Mensajes</th>
 			<th colspan="4">% ocupación</th>
-			<th colspan="4">% ocupación rechazados</th>
+			<th colspan="2">% ocupación rechazados</th>
 			<th rowspan="2">% mensajes rechazados</th>
-			<th rowspan="2">Tiempo promedio en el sistema por mensaje</th>
 			<th colspan="2">Promedio de devoluciones de 1 a</th>
-			<th rowspan="2">Tiempo promedio en colas</th>
-			<th rowspan="2">Tiempo promedio transmitiendo</th>
+			<th colspan="3">Tiempo promedio por mensaje en</th>
 			<th rowspan="2">% de tiempo en procesamiento por mensaje</th>
 			</tr>
 			<tr>
 			<th>Simulación</th>
-						<th>Reloj</th>
+						<th>Reloj (minutos)</th>
 			<th>Enviados</th>
 			<th>Rechazados</th>
 			<th>Total</th>
-			<th>PC 1</th>
+			<th>PC 1</th> <!-- Porcentaje de tiempo computando -->
 			<th>PC 2.1</th>
 			<th>PC 2.2</th>
 			<th>PC 3</th>
-			<th>PC 1</th>
-			<th>PC 2.1</th>
-			<th>PC 2.2</th>
+			<th>PC 1</th> <!-- Porcentaje de tiempo computando rechazados -->
 			<th>PC 3</th>
 			<th>PC 2</th><!-- Promedio devoluciones -->
 			<th>PC 3</th>
+			<th>Sistema</th><!-- Tiempo promedio por mensaje en -->
+			<th>Colas</th>
+			<th>Transmisión</th>
 			</tr>
 			</thead>
 			<tbody>
 			<tr ng-repeat="e in Simulaciones">
-				<td>{{Simulaciones.indexOf(e)}}</td>
-			<td>{{e.Reloj}}</td>
+				<td>{{Simulaciones.indexOf(e) + 1}}</td>
+			<td>{{e.Reloj | number:3}}</td>
 				<td>{{e.e.Enviados}}</td>
 				<td>{{e.e.Rechazados}}</td>
 				<td>{{e.e.NumTotal}}</td>
 			
-				<td>{{e.e.pOA}}</td>
-				<td>{{e.e.pOB1}}</td>
-				<td>{{e.e.pOB2}}</td>
-				<td>{{e.e.pOC}}</td>
+				<td>{{e.e.pOA * 100 | number:2}}%</td>
+				<td>{{e.e.pOB1 * 100 | number:2}}%</td>
+				<td>{{e.e.pOB2 * 100 | number:2}}%</td>
+				<td>{{e.e.pOC * 100 | number:2}}%</td>
 			
-				<td>{{e.e.pORA}}</td>
-				<td>{{e.e.pORB1}}</td>
-				<td>{{e.e.pORB2}}</td>
-				<td>{{e.e.pORC}}</td>
+				<td>{{e.e.pORA * 100 | number:2}}%</td>
+				<td>{{e.e.pORC * 100 | number:2}}%</td>
 			
-				<td>{{e.e.pMsgRechazado}}</td>
-				<td>{{e.e.TSistema}}</td>
+				<td>{{e.e.pMsgRechazado  * 100 | number:2}}</td>
 			
-				<td>{{e.e.DevolucionesB}}</td>
-				<td>{{e.e.DevolucionesC}}</td>
+				<td>{{e.e.DevolucionesB | number:5}}</td>
+				<td>{{e.e.DevolucionesC | number:5}}</td>
 			
-				<td>{{e.e.TiempoColas}}</td>
-				<td>{{e.e.TiempoTransmision}}</td>
+				<td>{{e.e.TSistema * 60  | number:2}}</td>
+				<td>{{e.e.TiempoColas * 60  | number:2}}</td>
+				<td>{{e.e.TiempoTransmision * 60  | number:2}}</td>
 			
-				<td>{{e.e.PorcentajeProcesamiento}}</td>
+				<td>{{e.e.PorcentajeProcesamiento * 100  | number:2}}%</td>
 			</tr>
 			<tr>
 			<td>Promedio total</td>
