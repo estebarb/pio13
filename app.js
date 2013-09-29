@@ -34,7 +34,8 @@ function SimulacionCtrl($scope){
 				{A:false, B1: false, B2: false, C:false}, //Estados
 				{
 					Enviados: CrearEstadisticas(), 
-					Rechazados: CrearEstadisticas()
+					Rechazados: CrearEstadisticas(),
+					Otros: CrearEstadisticas()
 				});
 			// Se insertan los primeros dos eventos
 			var eveB, eveC;
@@ -85,7 +86,8 @@ function SimulacionCtrl($scope){
 				{A:false, B1: false, B2: false, C:false}, //Estados
 				{
 					Enviados: CrearEstadisticas(), 
-					Rechazados: CrearEstadisticas()
+					Rechazados: CrearEstadisticas(),
+					Otros: CrearEstadisticas()
 				});
 			// Se insertan los primeros dos eventos
 			var eveB, eveC;
@@ -123,7 +125,8 @@ function SimulacionCtrl($scope){
 			{A:false, B1: false, B2: false, C:false}, //Estados
 			{
 				Enviados: CrearEstadisticas(), 
-				Rechazados: CrearEstadisticas()
+				Rechazados: CrearEstadisticas(),
+					Otros: CrearEstadisticas()
 			});
 		// Se insertan los primeros dos eventos
 		var eveB, eveC;
@@ -149,9 +152,17 @@ function SimulacionCtrl($scope){
 		e = $scope.SA;
 		// ¿Ya se acabó la simulación actual?
 		if (e.Finished){
+		
+			// Actualiza finalmente las estadísticas:
+			e = ActualizarEstadisticas(e, tiempo);
+			$scope.Simulaciones.pop();
+			$scope.Simulaciones.push(e);
+			$scope.SA = e;
+			$scope.$apply();
+			
 			window.setTimeout(
 				function(){
-					$scope.SimularResto(pausa, repeticiones-1, tiempo)
+					$scope.SimularBootstrap(pausa, repeticiones-1, tiempo)
 				},
 				pausa);
 		} else {

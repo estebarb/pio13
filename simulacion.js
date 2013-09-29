@@ -177,6 +177,9 @@ function Estado(Reloj, Colas, Eventos, Estados, Estadisticas){
 	// Estados = {A:false, B1: false, B2: true, C:false};
 	// true = ocupado, false = libre
 	this.Estados = Estados;
+	// Y la hora en que se ocuparon (para poder sacar el tiempo)
+	// de ocupación al final.
+	this.HoraOcupacion = {A:0, B1: 0, B2: 0, C:0};
 	
 	// Finalmente se guardan las estadísticas del sistema.
 	// Es necesario mantener estadísticas separadas para
@@ -185,11 +188,12 @@ function Estado(Reloj, Colas, Eventos, Estados, Estadisticas){
 	// enviados al cliente o son rechazados por completo.
 	// Tiene la forma:
 	// Estadisticas = {Enviados: new Estadisticas(...), 
-	//                 Rechazados: new Estadisticas(...)}
+	//                 Rechazados: new Estadisticas(...),
+	//					Otras: new Estadisticas(...)}
 	this.Estadisticas = Estadisticas;
 	
 	// Y estas son las estadísticas acumuladas:
-	this.e = { 
+	this.e = {
 		Enviados: 0,
 		Rechazados: 0,
 		NumTotal: 0,

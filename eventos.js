@@ -133,6 +133,8 @@ function HandlerRecibirMensajeC(estado, data){
 	if (! estado.Estados.C){
 		// Ahora está ocupado:
 		estado.Estados.C = true;
+		estado.HoraOcupacion.C = estado.Reloj;
+		
 		// Tiempo atendiéndose:
 		var ta = DistribucionExponencial(60/4);
 		// Se configura el evento "mensaje atendido por C":
@@ -162,6 +164,8 @@ function HandlerRecibirMensajeB(estado, data){
 	if (! estado.Estados.B1){
 		// B1 ahora está ocupado
 		estado.Estados.B1 = true;
+		estado.HoraOcupacion.B1 = estado.Reloj;
+		
 		// Tiempo atendiéndose:
 		var ta = DistribucionUniforme(12/60, 25/60);
 		// Se configura el evento "mensaje atendido por B":
@@ -174,6 +178,8 @@ function HandlerRecibirMensajeB(estado, data){
 	} else if (! estado.Estados.B2){
 		// B2 ahora está ocupado
 		estado.Estados.B2 = true;
+		estado.HoraOcupacion.B2 = estado.Reloj;
+		
 		// Tiempo atendiéndose:
 		var ta = DistribucionUniforme(12/60, 25/60);
 		// Se configura el evento "mensaje atendido por B":
@@ -203,6 +209,8 @@ function HandlerRecibirMensajeA(estado, data){
 	if (! estado.Estados.A){
 		// Ahora está ocupado:
 		estado.Estados.A = true;
+		estado.HoraOcupacion.A = estado.Reloj;
+		
 		// Tiempo atendiéndose:
 		var ta = DistribucionExponencial(10);
 		// Se configura el evento "mensaje atendido por A":
@@ -227,6 +235,7 @@ function HandlerAtendidoMensajeC(estado, data){
 	var msg = data.mensaje;
 	// Se actualizan las estadísticas:
 	msg.TiempoProcesamiento.C += DeltaTiempo(estado, msg);
+	estado.Estadisticas.Otros.TiempoComputo.C += DeltaTiempo(estado, msg);
 	// Se guarda la hora actual:
 	msg.HoraEvento = estado.Reloj;
 	// Y la PC actual:
@@ -260,6 +269,8 @@ function HandlerAtendidoMensajeC(estado, data){
 	// mensaje en la cola:
 	if(estado.Colas.C.length > 0){
 		estado.Estados.C = true;
+		estado.HoraOcupacion.C = estado.Reloj;
+		
 		// (cons msg estado.Colas.C) = estado.Colas.C
 		msg = estado.Colas.C.shift();
 		
@@ -285,6 +296,7 @@ function HandlerAtendidoMensajeB1(estado, data){
 	var msg = data.mensaje;
 	// Se actualizan las estadísticas:
 	msg.TiempoProcesamiento.B1 += DeltaTiempo(estado, msg);
+	estado.Estadisticas.Otros.TiempoComputo.B1 += DeltaTiempo(estado, msg);
 	// Se guarda la hora actual:
 	msg.HoraEvento = estado.Reloj;
 	// Y la PC actual:
@@ -305,6 +317,8 @@ function HandlerAtendidoMensajeB1(estado, data){
 	// mensaje en la cola:
 	if(estado.Colas.B.length > 0){
 		estado.Estados.B1 = true;
+		estado.HoraOcupacion.B1 = estado.Reloj;
+		
 		// (cons msg estado.Colas.B) = estado.Colas.B
 		msg = estado.Colas.B.shift();
 		
@@ -330,6 +344,7 @@ function HandlerAtendidoMensajeB2(estado, data){
 	var msg = data.mensaje;
 	// Se actualizan las estadísticas:
 	msg.TiempoProcesamiento.B2 += DeltaTiempo(estado, msg);
+	estado.Estadisticas.Otros.TiempoComputo.B2 += DeltaTiempo(estado, msg);
 	// Se guarda la hora actual:
 	msg.HoraEvento = estado.Reloj;
 	// Y la PC actual:
@@ -350,6 +365,8 @@ function HandlerAtendidoMensajeB2(estado, data){
 	// mensaje en la cola:
 	if(estado.Colas.B.length > 0){
 		estado.Estados.B2 = true;
+		estado.HoraOcupacion.B2 = estado.Reloj;
+		
 		// (cons msg estado.Colas.B) = estado.Colas.B
 		msg = estado.Colas.B.shift();
 		
@@ -375,6 +392,7 @@ function HandlerAtendidoMensajeA(estado, data){
 	var msg = data.mensaje;
 	// Se actualizan las estadísticas:
 	msg.TiempoProcesamiento.A += DeltaTiempo(estado, msg);
+	estado.Estadisticas.Otros.TiempoComputo.A += DeltaTiempo(estado, msg);
 	// Se guarda la hora actual:
 	msg.HoraEvento = estado.Reloj;
 	
@@ -423,6 +441,8 @@ function HandlerAtendidoMensajeA(estado, data){
 	// mensaje en la cola:
 	if(estado.Colas.A.length > 0){
 		estado.Estados.A = true;
+		estado.HoraOcupacion.A = estado.Reloj;
+		
 		// (cons msg estado.Colas.A) = estado.Colas.A
 		msg = estado.Colas.A.shift();
 		
@@ -454,6 +474,14 @@ function HandlerMetaEnviado(estado, data){
 	var msg = data.mensaje;
 	estadisticas = EstadisticasMensaje(estadisticas, msg);
 	estado.Estadisticas.Enviados = estadisticas;
+	
+	// Se actualizan las estadísticas otros, pues
+	// el mensaje ahora está en otra categoría.
+	estado.Estadisticas.Otros.A -= estadisticas.TiempoComputo.A;
+	estado.Estadisticas.Otros.B1 -= estadisticas.TiempoComputo.B1;
+	estado.Estadisticas.Otros.B2 -= estadisticas.TiempoComputo.B2;
+	estado.Estadisticas.Otros.C -= estadisticas.TiempoComputo.C;
+	
 	return ActualizarEstadisticas(estado);
 }
 
@@ -462,7 +490,15 @@ function HandlerMetaRechazado(estado, data){
 	var msg = data.mensaje;
 	estadisticas = EstadisticasMensaje(estadisticas, msg);
 	estado.Estadisticas.Rechazados = estadisticas;
-	return ActualizarEstadisticas(estado);
+	
+	// Se actualizan las estadísticas otros, pues
+	// el mensaje ahora está en otra categoría.
+	estado.Estadisticas.Otros.A -= estadisticas.TiempoComputo.A;
+	estado.Estadisticas.Otros.B1 -= estadisticas.TiempoComputo.B1;
+	estado.Estadisticas.Otros.B2 -= estadisticas.TiempoComputo.B2;
+	estado.Estadisticas.Otros.C -= estadisticas.TiempoComputo.C;
+	
+	return ActualizarEstadisticas(estado, estado.Reloj);
 }
 
 // EstadisticasMensaje(estadistica, mensaje)
@@ -507,25 +543,50 @@ function EstadisticasMensaje(e, m){
 // ActualizarEstadisticas(estado)
 // Actualiza las estadisticas acumuladas del sistema,
 // para que sean facilmente consumibles por Angular.js
-function ActualizarEstadisticas(e){
+function ActualizarEstadisticas(e, pseudoreloj){
 	// Cantidad de mensajes
 	e.e.Enviados = e.Estadisticas.Enviados.NumMsg;
 	e.e.Rechazados = e.Estadisticas.Rechazados.NumMsg;
 	e.e.NumTotal = e.e.Enviados + e.e.Rechazados;
 	
+	// Además hay que calcular cuanto tiempo han estado
+	// ocupados nuestros servidores con mensajes
+	// que aún no se han terminado de procesar.
+	var restoA = 0, restoB1 = 0, restoB2 = 0, restoC = 0;
+	if (e.Estados.A){
+		restoA = pseudoreloj - e.HoraOcupacion.A;
+	}
+	if (e.Estados.B1){
+		restoB1 = pseudoreloj - e.HoraOcupacion.B1;
+	}
+	if (e.Estados.B2){
+		restoB2 = pseudoreloj - e.HoraOcupacion.B2;
+	}
+	if (e.Estados.C){
+		restoC = pseudoreloj - e.HoraOcupacion.C;
+	}
+	
+	// Las estadísticas para mensajes ya procesados, pero
+	// que no han salido del sistema se guardan en 
+	// Estadisticas.Otros
+	
 	// Porcentaje de ocupación
 	e.e.pOA = (e.Estadisticas.Enviados.TiempoComputo.A +
-			 e.Estadisticas.Rechazados.TiempoComputo.A) 
-			 / e.Reloj;
+			 e.Estadisticas.Rechazados.TiempoComputo.A +
+			 e.Estadisticas.Otros.TiempoComputo.A + restoA) 
+			 / pseudoreloj;
 	e.e.pOB1 = (e.Estadisticas.Enviados.TiempoComputo.B1 +
-			 e.Estadisticas.Rechazados.TiempoComputo.B1) 
-			 / e.Reloj;
+			 e.Estadisticas.Rechazados.TiempoComputo.B1 +
+			 e.Estadisticas.Otros.TiempoComputo.B1 + restoB1) 
+			 / pseudoreloj;
 	e.e.pOB2 = (e.Estadisticas.Enviados.TiempoComputo.B2 +
-			 e.Estadisticas.Rechazados.TiempoComputo.B2) 
-			 / e.Reloj;
+			 e.Estadisticas.Rechazados.TiempoComputo.B2 +
+			 e.Estadisticas.Otros.TiempoComputo.B2 + restoB2) 
+			 / pseudoreloj;
 	e.e.pOC = (e.Estadisticas.Enviados.TiempoComputo.C +
-			 e.Estadisticas.Rechazados.TiempoComputo.C) 
-			 / e.Reloj;
+			 e.Estadisticas.Rechazados.TiempoComputo.C +
+			 e.Estadisticas.Otros.TiempoComputo.C + restoC) 
+			 / pseudoreloj;
 			 
 	// Porcentaje de ocupación en mensajes rechazados
 	e.e.pORA = e.Estadisticas.Rechazados.TiempoComputo.A
