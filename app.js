@@ -5,6 +5,8 @@
 function SimulacionCtrl($scope){
 	$scope.Simulaciones = [];
 	$scope.SA = {};
+	$scope.Promedios = {};
+	$scope.Confianza = {};
 	
 	$scope.MinutosSimulacion = 10;
 	$scope.CantidadRepeticiones = 1;
@@ -14,13 +16,18 @@ function SimulacionCtrl($scope){
 		// Inicializa los valores de la simulación
 		$scope.Simulaciones = [];
 		$scope.SA = {};
+		$scope.Promedios = {};
+		$scope.Confianza = {};
 		$scope.terminar = true;
 	};
 	
+	/*
 	$scope.Detener = function(){
 		$scope.terminar = true;
 	};
+	*/
 	
+	/*
 	$scope.SimularPaso = function(repeticiones, maxminutos){
 		if(repeticiones == 0){
 			return;
@@ -112,10 +119,12 @@ function SimulacionCtrl($scope){
 			e.Finished = true;			
 		};
 	};
+	*/
 	
 	$scope.SimularBootstrap = function(pausa, repeticiones, tiempo){
 		// ¿Ya se acabaron las repeticiones?
 		if (repeticiones <= 0){
+			$scope.ActualizarDatosAcumulados();
 			return;
 		}
 		var e = new Estado(
@@ -138,6 +147,7 @@ function SimulacionCtrl($scope){
 		// Hace binding entre el estado y la GUI
 		$scope.Simulaciones.push(e);
 		$scope.SA = e;
+		$scope.ActualizarDatosAcumulados();
 		$scope.$apply();
 		
 		// Llama al siguiente paso:
@@ -146,7 +156,7 @@ function SimulacionCtrl($scope){
 				$scope.SimularResto(pausa, repeticiones, tiempo)
 			},
 			pausa);
-	}
+	};
 	
 	$scope.SimularResto = function(pausa, repeticiones, tiempo){
 		e = $scope.SA;
@@ -158,6 +168,7 @@ function SimulacionCtrl($scope){
 			$scope.Simulaciones.pop();
 			$scope.Simulaciones.push(e);
 			$scope.SA = e;
+			$scope.ActualizarDatosAcumulados();
 			$scope.$apply();
 			
 			window.setTimeout(
@@ -179,7 +190,13 @@ function SimulacionCtrl($scope){
 			$scope.Simulaciones.pop();
 			$scope.Simulaciones.push(e);
 			$scope.SA = e;
-			$scope.$apply();		
+			
+			// Si el modo rápido está activado entonces
+			// NO actualizamos la GUI instantáneamente...
+			if(!$scope.ModoRapido){
+				$scope.ActualizarDatosAcumulados();
+				$scope.$apply();
+			}
 		
 			// Y hacemos una llamada "recursiva"
 			window.setTimeout(
@@ -188,12 +205,14 @@ function SimulacionCtrl($scope){
 				},
 				pausa);
 		}
-	}
+	};
 	
 	$scope.Simular2 = function(){
 		// Borra el estado del sistema...
 		$scope.Simulaciones = [];
 		$scope.SA = null;
+		$scope.Promedios = {};
+		$scope.Confianza = {};
 		
 		if (!isNumber($scope.PausaMilis)){
 			alert("La pausa debe ser un número entero no negativo.");
@@ -214,7 +233,43 @@ function SimulacionCtrl($scope){
 				$scope.CantidadRepeticiones,
 				$scope.MinutosSimulacion
 				);
-	}
+	};
+	
+	// Actualiza los promedios del batch
+	// actual de simulaciones.
+	$scope.ActualizarDatosAcumulados = function(){
+		// Suma e al acumulador s
+		var sum = function(e, s){
+			return e + s;
+		}
+	
+		var p = {}, s, c = {};
+		s = $scope.Simulaciones;
+		
+		// Se calculan los promedios:
+		var valores = ["Reloj",
+		"Enviados", "Rechazados", "NumTotal",
+		"pOA", "pOB1", "pOB2", "pOC",
+		"pORA", "pORC",
+		"pMsgRechazado",
+		"DevolucionesB", "DevolucionesC",
+		"TSistema", "TiempoColas", "TiempoTransmision",
+		"PorcentajeProcesamiento"];
+		
+		valores.forEach(
+			function(elemento){
+				p[elemento] = s.map(function(val){
+						return val.e[elemento]
+					}).reduce(sum) / Math.max(1, s.length);
+			}
+		);
+				
+		
+		/////////////////////////////////////////////////////////
+		// Y se asigna al binding correspondiente:
+		$scope.Promedios = p;
+		$scope.Confianza = c;
+	};
 }
 
 // Determina si un número es un número entero o no

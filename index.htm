@@ -2,10 +2,12 @@
 <html ng-app>
 <head>
 <meta charset="utf-8">
-<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">
+<!--<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet">-->
+<link href="//netdna.bootstrapcdn.com/bootswatch/3.0.0/flatly/bootstrap.min.css" rel="stylesheet"></link>
 <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min.js"></script>
 <script src="//code.jquery.com/jquery.js"></script>
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+
 <!-- Código propio de la simulacion -->
 <script src="distribuciones.js"></script>
 <script src="eventos.js"></script>
@@ -31,7 +33,7 @@
 			<input id="txtPausa" type="number" min="0" max="1000" value="0" ng-model="PausaMilis"/></li>
 			</ul>
 		</div>
-		<div class="col-lg-3">
+		<div class="col-lg-6">
 			<button class="form-control btn btn-danger" ng-click="Reiniciar()">Reiniciar</button>
 			<br/>
 			<!--
@@ -39,6 +41,7 @@
 			<br/>
 			-->
 			<button class="form-control btn btn-success" ng-click="Simular2()">Iniciar Simulación</button>
+			<input type="checkbox" ng-model="ModoRapido" id="chkRapido"/> <label for="chkRapido">No mostrar los resultados en tiempo real</label>
 		</div>
 	</div>
 	<div class="row">
@@ -76,7 +79,7 @@
 	</div>
 	<div class="row">
 		<h1>Rendimiento del sistema</h1>
-		<table class="table table-hover table-bordered">
+		<table class="table table-hover table-bordered" style="width: 400px;">
 			<thead>
 			<tr>
 			<th></th>
@@ -111,32 +114,123 @@
 			<tbody>
 			<tr ng-repeat="e in Simulaciones">
 				<td>{{Simulaciones.indexOf(e) + 1}}</td>
-			<td>{{e.Reloj | number:3}}</td>
+			<td>{{e.Reloj | number:4}}</td>
 				<td>{{e.e.Enviados}}</td>
 				<td>{{e.e.Rechazados}}</td>
 				<td>{{e.e.NumTotal}}</td>
 			
-				<td>{{e.e.pOA * 100 | number:2}}%</td>
-				<td>{{e.e.pOB1 * 100 | number:2}}%</td>
-				<td>{{e.e.pOB2 * 100 | number:2}}%</td>
-				<td>{{e.e.pOC * 100 | number:2}}%</td>
+				<td>{{e.e.pOA * 100 | number:4}}%</td>
+				<td>{{e.e.pOB1 * 100 | number:4}}%</td>
+				<td>{{e.e.pOB2 * 100 | number:4}}%</td>
+				<td>{{e.e.pOC * 100 | number:4}}%</td>
 			
-				<td>{{e.e.pORA * 100 | number:2}}%</td>
-				<td>{{e.e.pORC * 100 | number:2}}%</td>
+				<td>{{e.e.pORA * 100 | number:4}}%</td>
+				<td>{{e.e.pORC * 100 | number:4}}%</td>
 			
-				<td>{{e.e.pMsgRechazado  * 100 | number:2}}</td>
+				<td>{{e.e.pMsgRechazado  * 100 | number:4}}</td>
 			
 				<td>{{e.e.DevolucionesB | number:5}}</td>
 				<td>{{e.e.DevolucionesC | number:5}}</td>
 			
-				<td>{{e.e.TSistema * 60  | number:2}}s</td>
-				<td>{{e.e.TiempoColas * 60  | number:2}}s</td>
-				<td>{{e.e.TiempoTransmision * 60  | number:2}}s</td>
+				<td>{{e.e.TSistema * 60  | number:4}}s</td>
+				<td>{{e.e.TiempoColas * 60  | number:4}}s</td>
+				<td>{{e.e.TiempoTransmision * 60  | number:4}}s</td>
 			
-				<td>{{e.e.PorcentajeProcesamiento * 100  | number:2}}%</td>
+				<td>{{e.e.PorcentajeProcesamiento * 100  | number:4}}%</td>
 			</tr>
-			<tr>
-			<td>Promedio total</td>
+			<tr class="warning">
+			<th>Promedio total</th>
+			<td>{{Promedios.Reloj || 0 | number:4}}</td>
+				<td>{{Promedios.Enviados || 0 | number:4}}</td>
+				<td>{{Promedios.Rechazados || 0 | number:4}}</td>
+				<td>{{Promedios.NumTotal || 0 | number:4}}</td>
+			
+				<td>{{Promedios.pOA * 100 || 0 | number:4}}%</td>
+				<td>{{Promedios.pOB1 * 100 || 0 | number:4}}%</td>
+				<td>{{Promedios.pOB2 * 100 || 0 | number:4}}%</td>
+				<td>{{Promedios.pOC * 100 || 0 | number:4}}%</td>
+			
+				<td>{{Promedios.pORA * 100 || 0 | number:4}}%</td>
+				<td>{{Promedios.pORC * 100 || 0 | number:4}}%</td>
+			
+				<td>{{Promedios.pMsgRechazado  * 100 || 0 | number:4}}</td>
+			
+				<td>{{Promedios.DevolucionesB || 0 | number:5}}</td>
+				<td>{{Promedios.DevolucionesC || 0 | number:5}}</td>
+			
+				<td>{{Promedios.TSistema * 60 || 0  | number:4}}s</td>
+				<td>{{Promedios.TiempoColas * 60 || 0  | number:4}}s</td>
+				<td>{{Promedios.TiempoTransmision * 60 || 0  | number:4}}s</td>
+			
+				<td>{{Promedios.PorcentajeProcesamiento * 100 || 0  | number:4}}%</td>
+			</tr>
+			<tr class="success">
+			<th>Intervalo de confianza:</th>
+<td>[{{Confianza.Reloj.Min || 0 | number:4}},
+{{Confianza.Reloj.Max || 0 | number:4}}]</td>
+
+<td>[{{Confianza.Enviados.Min || 0 | number:4}},
+{{Confianza.Enviados.Max || 0 | number:4}}]</td>
+
+<td>[{{Confianza.Rechazados.Min || 0 | number:4}},
+{{Confianza.Rechazados.Max || 0 | number:4}}]</td>
+
+<td>[{{Confianza.NumTotal.Min || 0 | number:4}},
+{{Confianza.NumTotal.Max || 0 | number:4}}]</td>
+
+
+
+<td>[{{Confianza.pOA.Min * 100 || 0 | number:4}}%,
+{{Confianza.pOA.Max * 100 || 0 | number:4}}%]</td>
+
+<td>[{{Confianza.pOB1.Min * 100 || 0 | number:4}}%,
+{{Confianza.pOB1.Max * 100 || 0 | number:4}}%]</td>
+
+<td>[{{Confianza.pOB2.Min * 100 || 0 | number:4}}%,
+{{Confianza.pOB2.Max * 100 || 0 | number:4}}%]</td>
+
+<td>[{{Confianza.pOC.Min * 100 || 0 | number:4}}%,
+{{Confianza.pOC.Max * 100 || 0 | number:4}}%]</td>
+
+
+
+<td>[{{Confianza.pORA.Min * 100 || 0 | number:4}}%,
+{{Confianza.pORA.Max * 100 || 0 | number:4}}%]</td>
+
+<td>[{{Confianza.pORC.Min * 100 || 0 | number:4}}%,
+{{Confianza.pORC.Max * 100 || 0 | number:4}}%]</td>
+
+
+
+
+<td>[{{Confianza.pMsgRechazado.Min  * 100 || 0 | number:4}},
+{{Confianza.pMsgRechazado.Max  * 100 || 0 | number:4}}]</td>
+
+
+
+<td>[{{Confianza.DevolucionesB.Min || 0 | number:5}},
+{{Confianza.DevolucionesB.Max || 0 | number:5}}]</td>
+
+<td>[{{Confianza.DevolucionesC.Min || 0 | number:5}},
+{{Confianza.DevolucionesC.Max || 0 | number:5}}]</td>
+
+
+
+
+<td>[{{Confianza.TSistema.Min * 60 || 0  | number:4}}s,
+{{Confianza.TSistema * 60 || 0  | number:4}}s]</td>
+
+<td>[{{Confianza.TiempoColas.Min * 60 || 0  | number:4}}s,
+{{Confianza.TiempoColas.Max * 60 || 0  | number:4}}s]</td>
+
+<td>[{{Confianza.TiempoTransmision.Min * 60 || 0  | number:4}}s,
+{{Confianza.TiempoTransmision.Max * 60 || 0  | number:4}}s]</td>
+
+
+
+
+<td>[{{Confianza.PorcentajeProcesamiento.Min * 100 || 0  | number:4}}%,
+{{Confianza.PorcentajeProcesamiento.Max * 100 || 0  | number:4}}%]</td>
 			</tr>
 			</tbody>
 		</table>
