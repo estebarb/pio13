@@ -579,11 +579,6 @@ function ActualizarEstadisticas(e, pseudoreloj){
 	// Estadisticas.Otros
 	
 	// Porcentaje de ocupación
-	console.log("Ahora es: %f", e.Reloj);
-	console.log(e.Estadisticas.Enviados.TiempoComputo.A);
-	console.log(e.Estadisticas.Enviados.TiempoComputo.A+
-			 e.Estadisticas.Rechazados.TiempoComputo.A);
-	console.log(e.Estadisticas.Otros.TiempoComputo.A + restoA);
 			 
 	 e.e.pOA = (e.Estadisticas.Otros.TiempoComputo.A + restoA) 
 			 / pseudoreloj;
