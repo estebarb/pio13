@@ -194,6 +194,20 @@ function SimulacionCtrl($scope){
 		// Borra el estado del sistema...
 		$scope.Simulaciones = [];
 		$scope.SA = null;
+		
+		if (!isNumber($scope.PausaMilis)){
+			alert("La pausa debe ser un número entero no negativo.");
+			return;
+		}
+		if (!isNumber($scope.CantidadRepeticiones)){
+			alert("La cantidad de repeticiones debe ser un entero no negativo.");
+			return;
+		}
+		if (!isNumber($scope.MinutosSimulacion)){
+			alert("La cantidad de minutos a simular debe ser un entero no negativo.");
+			return;
+		}
+		
 		// Y comienza la simulación:
 		$scope.SimularBootstrap(
 				$scope.PausaMilis,
@@ -201,4 +215,10 @@ function SimulacionCtrl($scope){
 				$scope.MinutosSimulacion
 				);
 	}
+}
+
+// Determina si un número es un número entero o no
+// basado en http://stackoverflow.com/questions/18082/validate-numbers-in-javascript-isnumeric
+function isNumber(n) {
+  return !isNaN(parseInt(n)) && isFinite(n) && parseInt(n) == parseFloat(n);
 }
