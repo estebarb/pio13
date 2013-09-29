@@ -56,19 +56,19 @@
 			</thead>
 			<tbody>
 				<tr><td>Servidor 1</td>
-					<td>{{SA.Estados.A}}</td>
-					<td>{{SA.Colas.A.length}}</td>
+					<td>{{SA.Estados.A && 'Ocupado' || 'Libre'}}</td>
+					<td>{{SA.Colas.A.length || 0}}</td>
 				</tr>
 				<tr><td>Servidor 2.1</td>
-					<td>{{SA.Estados.B1}}</td>
-					<td rowspan="2">{{SA.Colas.B.length}}</td>
+					<td>{{SA.Estados.B1 && 'Ocupado' || 'Libre'}}</td>
+					<td rowspan="2">{{SA.Colas.B.length || 0}}</td>
 				</tr>
 				<tr><td>Servidor 2.2</td>
-					<td>{{SA.Estados.B2}}</td>
+					<td>{{SA.Estados.B2 && 'Ocupado' || 'Libre'}}</td>
 				</tr>
 				<tr><td>Servidor 3</td>
-					<td>{{SA.Estados.C}}</td>
-					<td>{{SA.Colas.C.length}}</td>
+					<td>{{SA.Estados.C && 'Ocupado' || 'Libre'}}</td>
+					<td>{{SA.Colas.C.length || 0}}</td>
 				</tr>
 			</tbody>
 			</table>
