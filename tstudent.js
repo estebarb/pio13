@@ -62,7 +62,6 @@ function TStudentDistribution(X, df) {
 	if(df < 1){
 		df = 1;
 	}
-	console.log(X);
 	var val = ValoresStudent[X];
 	
 	// La cantidad de experimentos es menor o igual que 30

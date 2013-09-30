@@ -23,111 +23,13 @@ function SimulacionCtrl($scope){
 		$scope.terminar = true;
 	};
 	
-	/*
-	$scope.Detener = function(){
-		$scope.terminar = true;
-	};
-	*/
-	
-	/*
-	$scope.SimularPaso = function(repeticiones, maxminutos){
-		if(repeticiones == 0){
-			return;
-		}
-		if ($scope.Simulaciones.length == 0 || $scope.SA.Finished){
-			// Se crea un estado nuevo
-			var e = new Estado(
-				0, //Reloj
-				{A: [], B: [], C:[]}, //Colas
-				[], //Eventos
-				{A:false, B1: false, B2: false, C:false}, //Estados
-				{
-					Enviados: CrearEstadisticas(), 
-					Rechazados: CrearEstadisticas(),
-					Otros: CrearEstadisticas()
-				});
-			// Se insertan los primeros dos eventos
-			var eveB, eveC;
-			eveB = new FactoryEventos(0, null).CrearMensajeB();
-			eveC = new FactoryEventos(0, null).CrearMensajeC();
-			e = PushEvent(eveB, e);
-			e = PushEvent(eveC, e);
-			
-			// Hace binding entre el estado y la GUI
-			$scope.Simulaciones.push(e);
-			$scope.SA = e;
-		} else {
-			var e = $scope.SA;
-			
-			// Ejecuta un paso de la simulación
-			e = SimulationStep(e);
-			
-			// Hay que revisar si ya la simulación acabó:
-			if(PeekEvent(e).Tiempo > maxminutos){
-				repeticiones--;
-				e.Finished = true;
-			}
-			
-			// Actualiza los bindings
-			$scope.Simulaciones.pop();
-			$scope.Simulaciones.push(e);
-			$scope.SA = e;
-		}
-		
-		// Si el usuario no ha presionado pausar entonces sigue...
-		if(! $scope.terminar){
-			setTimeout(function(){
-				$scope.SimularPaso(repeticiones, maxminutos);
-				console.log("corre");
-				},
-				$scope.PausaMilis);
-		}
-	};
-	
-	$scope.SimularTodo = function(){
-		//$scope.terminar = false;
-		//$scope.SimularPaso($scope.CantidadRepeticiones, $scope.MinutosSimulacion);
-		for(var r = 0; r < $scope.CantidadRepeticiones; r++){
-			var e = new Estado(
-				0, //Reloj
-				{A: [], B: [], C:[]}, //Colas
-				[], //Eventos
-				{A:false, B1: false, B2: false, C:false}, //Estados
-				{
-					Enviados: CrearEstadisticas(), 
-					Rechazados: CrearEstadisticas(),
-					Otros: CrearEstadisticas()
-				});
-			// Se insertan los primeros dos eventos
-			var eveB, eveC;
-			eveB = new FactoryEventos(0, null).CrearMensajeB();
-			eveC = new FactoryEventos(0, null).CrearMensajeC();
-			e = PushEvent(eveB, e);
-			e = PushEvent(eveC, e);
-			
-			// Hace binding entre el estado y la GUI
-			$scope.Simulaciones.push(e);
-			$scope.SA = e;
-			
-			while(PeekEvent(e).Tiempo <= $scope.MinutosSimulacion){
-				e = SimulationStep(e);
-				// Actualiza Modelo
-				$scope.Simulaciones.pop();
-				$scope.Simulaciones.push(e);
-				$scope.SA = e;
-				$scope.$apply();
-			}
-			
-			e.Finished = true;			
-		};
-	};
-	*/
-	
-	$scope.SimularBootstrap = function(pausa, repeticiones, tiempo){
+	// Realiza el bootstrap de una ejecución de la simulación
+	$scope.DoBootstrap = function(repeticiones, tiempo){
 		// ¿Ya se acabaron las repeticiones?
 		if (repeticiones <= 0){
 			$scope.ActualizarDatosAcumulados();
-			return;
+			$scope.$apply();
+			return false;
 		}
 		var e = new Estado(
 			0, //Reloj
@@ -149,9 +51,16 @@ function SimulacionCtrl($scope){
 		// Hace binding entre el estado y la GUI
 		$scope.Simulaciones.push(e);
 		$scope.SA = e;
+		
+		return true;
+	};
+	
+	$scope.SimularBootstrap = function(pausa, repeticiones, tiempo){
+		if(!$scope.DoBootstrap(repeticiones, tiempo)){
+			return;
+		}
 		$scope.ActualizarDatosAcumulados();
 		$scope.$apply();
-		
 		// Llama al siguiente paso:
 		window.setTimeout(
 			function(){
@@ -160,7 +69,7 @@ function SimulacionCtrl($scope){
 			pausa);
 	};
 	
-	$scope.SimularResto = function(pausa, repeticiones, tiempo){
+	$scope.DoSimulationStep = function(repeticiones, tiempo){
 		e = $scope.SA;
 		// ¿Ya se acabó la simulación actual?
 		if (e.Finished){
@@ -170,14 +79,8 @@ function SimulacionCtrl($scope){
 			$scope.Simulaciones.pop();
 			$scope.Simulaciones.push(e);
 			$scope.SA = e;
-			$scope.ActualizarDatosAcumulados();
-			$scope.$apply();
 			
-			window.setTimeout(
-				function(){
-					$scope.SimularBootstrap(pausa, repeticiones-1, tiempo)
-				},
-				pausa);
+			return false;
 		} else {
 			// Ejecutamos un paso	
 			e = SimulationStep(e);
@@ -193,23 +96,36 @@ function SimulacionCtrl($scope){
 			$scope.Simulaciones.push(e);
 			$scope.SA = e;
 			
-			// Si el modo rápido está activado entonces
-			// NO actualizamos la GUI instantáneamente...
-			if(!$scope.ModoRapido){
-				$scope.ActualizarDatosAcumulados();
-				$scope.$apply();
-			}
-		
-			// Y hacemos una llamada "recursiva"
+			return true;
+		}
+	};
+	
+	$scope.SimularResto = function(pausa, repeticiones, tiempo){
+		var sigue = $scope.DoSimulationStep(repeticiones, tiempo);
+		// Si el modo rápido está activado entonces
+		// NO actualizamos la GUI instantáneamente...
+		if(!$scope.ModoRapido){
+			$scope.ActualizarDatosAcumulados();
+			$scope.$apply();
+		}
+		if(sigue){
+			// En este caso se debe repetir SimularResto
 			window.setTimeout(
 				function(){
-					$scope.SimularResto(pausa, repeticiones, tiempo)
+					$scope.SimularResto(pausa, repeticiones, tiempo);
+				},
+				pausa);
+		} else {
+			// En este otro se debe llamar a SimularBootstrap
+			window.setTimeout(
+				function(){
+					$scope.SimularBootstrap(pausa, repeticiones-1, tiempo);
 				},
 				pausa);
 		}
 	};
 	
-	$scope.Simular2 = function(){
+	$scope.FirstExecution = function(){
 		// Borra el estado del sistema...
 		$scope.Simulaciones = [];
 		$scope.SA = null;
@@ -218,20 +134,27 @@ function SimulacionCtrl($scope){
 		
 		if (!isNumber($scope.PausaMilis)){
 			alert("La pausa debe ser un número entero no negativo.");
-			return;
+			return false;
 		}
 		if (!isNumber($scope.CantidadRepeticiones)){
 			alert("La cantidad de repeticiones debe ser un entero no negativo.");
-			return;
+			return false;
 		}
 		if (!isNumber($scope.MinutosSimulacion)){
 			alert("La cantidad de minutos a simular debe ser un entero no negativo.");
-			return;
+			return false;
 		}
 		if (!isFloat($scope.PorcentajeConfianza) &&
 		 $scope.PorcentajeConfianza > 0 &&
 		 $scope.PorcentajeConfianza < 100){
 			alert("El porcentaje de confianza debe ser un número flotante entre 0 y 100");
+			return false;
+		}
+		return true
+	};
+	
+	$scope.Simular2 = function(){
+		if(!$scope.FirstExecution()){
 			return;
 		}
 		
@@ -241,6 +164,41 @@ function SimulacionCtrl($scope){
 				$scope.CantidadRepeticiones,
 				$scope.MinutosSimulacion
 				);
+	};
+	
+	$scope.FastExecution = function(){
+		if(!$scope.FirstExecution()){
+			return;
+		}
+		
+		// Y comienza la simulación:
+		$scope.FastExec(
+				$scope.CantidadRepeticiones,
+				$scope.MinutosSimulacion
+				);
+	};
+	
+	$scope.FastExec = function(repeticiones, minutos){
+		if(repeticiones>0){
+			// Hace el bootstraping:
+			$scope.DoBootstrap(repeticiones, minutos);
+		
+			// Hace una simulación completa
+			while($scope.DoSimulationStep(repeticiones, minutos)){}
+	
+			// Actualiza las estadísticas
+			$scope.ActualizarDatosAcumulados();
+			$scope.$apply();
+		
+			// Hace la llamada recursiva:
+			window.setTimeout(function(){
+						$scope.FastExec(repeticiones-1, minutos);
+					},
+					0);
+		} else {
+			$scope.ActualizarDatosAcumulados();
+			$scope.$apply();
+		}
 	};
 	
 	// Actualiza los promedios del batch
