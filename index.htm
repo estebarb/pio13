@@ -12,6 +12,7 @@
 <script src="distribuciones.js"></script>
 <script src="eventos.js"></script>
 <script src="simulacion.js"></script>
+<script src="tstudent.js"></script>
 <script src="app.js"></script>
 </head>
 <body ng-controller="SimulacionCtrl">
@@ -234,6 +235,16 @@
 			</tr>
 			</tbody>
 		</table>
+		<p>
+<ul>
+	<li>
+		<label for="txtConfianza"> Porcentaje de confianza</label>
+		<select class="combobox" ng-model="PorcentajeConfianza" ng-options="d+'%' for d in AcumuladaStudent" combobox>
+		</select>
+		<button class="btn btn-info" ng-click="ActualizarDatosAcumulados()()">Actualizar estadísticas</button>
+	</li>
+</ul>
+		</p>
 	</div>
 </div>
 <p>&nbsp;</p>

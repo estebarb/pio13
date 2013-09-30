@@ -9,8 +9,10 @@ function SimulacionCtrl($scope){
 	$scope.Confianza = {};
 	
 	$scope.MinutosSimulacion = 10;
-	$scope.CantidadRepeticiones = 1;
-	$scope.PausaMilis = 500;
+	$scope.CantidadRepeticiones = 10;
+	$scope.PausaMilis = 0;
+	$scope.PorcentajeConfianza = 95;
+	$scope.AcumuladaStudent = StudentDisponibles;
 	
 	$scope.Reiniciar = function(){
 		// Inicializa los valores de la simulación
@@ -226,6 +228,12 @@ function SimulacionCtrl($scope){
 			alert("La cantidad de minutos a simular debe ser un entero no negativo.");
 			return;
 		}
+		if (!isFloat($scope.PorcentajeConfianza) &&
+		 $scope.PorcentajeConfianza > 0 &&
+		 $scope.PorcentajeConfianza < 100){
+			alert("El porcentaje de confianza debe ser un número flotante entre 0 y 100");
+			return;
+		}
 		
 		// Y comienza la simulación:
 		$scope.SimularBootstrap(
@@ -246,7 +254,7 @@ function SimulacionCtrl($scope){
 		var p = {}, s, c = {};
 		s = $scope.Simulaciones;
 		
-		// Se calculan los promedios:
+		// Los valores que deseamos calcular
 		var valores = ["Reloj",
 		"Enviados", "Rechazados", "NumTotal",
 		"pOA", "pOB1", "pOB2", "pOC",
@@ -256,11 +264,40 @@ function SimulacionCtrl($scope){
 		"TSistema", "TiempoColas", "TiempoTransmision",
 		"PorcentajeProcesamiento"];
 		
+		// Para evitar divisiones entre 0
+		var total = Math.max(1, s.length);
+		
+		// Se calcula el alfa y el t de student para
+		// el porcentaje de confianza deseado
+		var alfa = $scope.PorcentajeConfianza;
+		if(!isFloat(alfa)){
+			$scope.PorcentajeConfianza = 95;
+			alfa = 95;
+		}
+		//var alfa = (100 - $scope.PorcentajeConfianza)/100;
+		
+//		var t = TStudentDistribution(alfa / 2, total - 1);
+		var t = TStudentDistribution(alfa, total - 1);
+		
+		
+		// Se calculan los promedios e intervalos de confianza:
 		valores.forEach(
-			function(elemento){
-				p[elemento] = s.map(function(val){
+			function(elemento){				
+				// Calcula el promedio
+				var media = s.map(function(val){
 						return val.e[elemento]
-					}).reduce(sum) / Math.max(1, s.length);
+					}).reduce(sum) / total;
+					
+				// Calcula la varianza
+				var S2 = s.map(function(val){
+					return (val.e[elemento] - media)*(val.e[elemento] - media);
+				}).reduce(sum) / Math.max(1, total-1);
+				
+				// Se calcula el margen de error:
+				var mE = t * Math.sqrt(S2/total);
+					
+				p[elemento] = media;
+				c[elemento] = {Max: media + mE, Min: media - mE};
 			}
 		);
 				
@@ -274,6 +311,11 @@ function SimulacionCtrl($scope){
 
 // Determina si un número es un número entero o no
 // basado en http://stackoverflow.com/questions/18082/validate-numbers-in-javascript-isnumeric
+// Pero además valida que el número introducido sea un entero.
 function isNumber(n) {
-  return !isNaN(parseInt(n)) && isFinite(n) && parseInt(n) == parseFloat(n);
+	return !isNaN(parseInt(n)) && isFinite(n) && parseInt(n) == parseFloat(n);
+}
+
+function isFloat(n) {
+	return !isNaN(parseFloat(n)) && isFinite(n);
 }
