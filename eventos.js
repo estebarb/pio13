@@ -257,7 +257,7 @@ function HandlerAtendidoMensajeC(estado, data){
 		// Sino enviamos el mensaje a PC A,
 		// quien lo recibirá en el futuro...
 		var evento = new FactoryEventos(
-			estado.Reloj + DistribucionX600(),
+			estado.Reloj + DistribucionConstante(20/60),// DistribucionX600(),
 			{mensaje: msg}
 			).RecibirMensajeA();
 		estado = PushEvent(evento, estado);
@@ -307,7 +307,7 @@ function HandlerAtendidoMensajeB1(estado, data){
 	// Enviamos el mensaje a PC A,
 	// quien lo recibirá en el futuro...
 	var evento = new FactoryEventos(
-		estado.Reloj + DistribucionX600(),
+		estado.Reloj + DistribucionConstante(20/60),//DistribucionX600(),
 		{mensaje: msg}
 		).RecibirMensajeA();
 	estado = PushEvent(evento, estado);
@@ -356,7 +356,7 @@ function HandlerAtendidoMensajeB2(estado, data){
 	// Enviamos el mensaje a PC A,
 	// quien lo recibirá en el futuro...
 	var evento = new FactoryEventos(
-		estado.Reloj + DistribucionX600(),
+		estado.Reloj + DistribucionConstante(20/60),//DistribucionX600(),
 		{mensaje: msg}
 		).RecibirMensajeA();
 	estado = PushEvent(evento, estado);
@@ -424,14 +424,14 @@ function HandlerAtendidoMensajeA(estado, data){
 		// El mensaje será devuelto a B
 		msg.Devoluciones.B++;
 		evento = new FactoryEventos(
-			estado.Reloj + DistribucionUniforme(3/60, 5/60),
+			estado.Reloj + DistribucionConstante(3/60), //DistribucionUniforme(3/60, 5/60),
 			{mensaje: msg}
 			).RecibirMensajeB();
 	} else {
 		// El mensaje será devuelto a C
 		msg.Devoluciones.C++;
 		evento = new FactoryEventos(
-			estado.Reloj + DistribucionUniforme(3/60, 5/60),
+			estado.Reloj + DistribucionConstante(3/60), //DistribucionUniforme(3/60, 5/60),
 			{mensaje: msg}
 			).RecibirMensajeC();
 	}

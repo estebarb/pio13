@@ -10,6 +10,14 @@
 
 /// Funciones de distribuciones de probabilidad:
 
+// DistribucionConstante(NN)
+// Retorna una distribución constante. La razón de su
+// existencia es tener código autoexplicativo, pero 
+// es la función identidad.
+function DistribucionConstante(n){
+	return n;
+}
+
 
 // DistribuciónMoneda(NN)
 // Retorna true o false según un número aleatorio sea mayor
