@@ -1,0 +1,41 @@
+﻿<h1>Simulación Actual</h1>
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Servidor</th>
+            <th>Estado</th>
+            <th>Mensajes en cola</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Servidor 1</td>
+            <td>{{SA.Estados.A && 'Ocupado' || 'Libre'}}</td>
+            <td>{{SA.Colas.A.length || 0}}</td>
+        </tr>
+        <tr>
+            <td>Servidor 2.1</td>
+            <td>{{SA.Estados.B1 && 'Ocupado' || 'Libre'}}</td>
+            <td rowspan="2">{{SA.Colas.B.length || 0}}</td>
+        </tr>
+        <tr>
+            <td>Servidor 2.2</td>
+            <td>{{SA.Estados.B2 && 'Ocupado' || 'Libre'}}</td>
+        </tr>
+        <tr>
+            <td>Servidor 3</td>
+            <td>{{SA.Estados.C && 'Ocupado' || 'Libre'}}</td>
+            <td>{{SA.Colas.C.length || 0}}</td>
+        </tr>
+    </tbody>
+</table>
+<dl>
+    <dt>Reloj:</dt>
+       <dd>{{SA.Reloj}}</dd>
+    <dt>Mensajes enviados:</dt>
+       <dd>{{SA.e.Enviados}}</dd>
+    <dt>Mensajes rechazados:</dt>
+       <dd>{{SA.e.Rechazados}}</dd>
+    <dt>{{SA.Ejecutando.Nombre}}</dt>
+      <dd>{{SA.Ejecutando.Descripcion}}</dd>
+</dl>

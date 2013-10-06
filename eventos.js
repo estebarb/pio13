@@ -422,14 +422,14 @@ function HandlerAtendidoMensajeA(estado, data){
 			).MetaEnviado();		
 	} else if (2 == anterior){
 		// El mensaje será devuelto a B
-		msg.Devoluciones.B++;
+		msg.Devoluciones++;
 		evento = new FactoryEventos(
 			estado.Reloj + DistribucionConstante(3/60), //DistribucionUniforme(3/60, 5/60),
 			{mensaje: msg}
 			).RecibirMensajeB();
 	} else {
 		// El mensaje será devuelto a C
-		msg.Devoluciones.C++;
+		msg.Devoluciones++;
 		evento = new FactoryEventos(
 			estado.Reloj + DistribucionConstante(3/60), //DistribucionUniforme(3/60, 5/60),
 			{mensaje: msg}
@@ -527,8 +527,8 @@ function EstadisticasMensaje(e, m){
 	e.TiempoEnSistema += m.HoraEvento - m.HoraCreacion;
 	
 	// Cantidad de devoluciones (B y C)
-	e.Devoluciones.B += m.Devoluciones.B;
-	e.Devoluciones.C += m.Devoluciones.C;
+	e.Devoluciones += m.Devoluciones;
+	//e.Devoluciones.C += m.Devoluciones.C;
 	
 	// Cantidad de tiempo en colas (A, B y C)
 	e.TiempoColas	+= m.TiempoColas;
@@ -591,24 +591,6 @@ function ActualizarEstadisticas(e, pseudoreloj){
 			 / pseudoreloj;
 	e.e.pOC = (e.Estadisticas.Otros.TiempoComputo.C + restoC) 
 			 / pseudoreloj;
-	/*			
-	e.e.pOA = (e.Estadisticas.Enviados.TiempoComputo.A +
-			 e.Estadisticas.Rechazados.TiempoComputo.A +
-			 e.Estadisticas.Otros.TiempoComputo.A + restoA) 
-			 / pseudoreloj;
-	e.e.pOB1 = (e.Estadisticas.Enviados.TiempoComputo.B1 +
-			 e.Estadisticas.Rechazados.TiempoComputo.B1 +
-			 e.Estadisticas.Otros.TiempoComputo.B1 + restoB1) 
-			 / pseudoreloj;
-	e.e.pOB2 = (e.Estadisticas.Enviados.TiempoComputo.B2 +
-			 e.Estadisticas.Rechazados.TiempoComputo.B2 +
-			 e.Estadisticas.Otros.TiempoComputo.B2 + restoB2) 
-			 / pseudoreloj;
-	e.e.pOC = (e.Estadisticas.Enviados.TiempoComputo.C +
-			 e.Estadisticas.Rechazados.TiempoComputo.C +
-			 e.Estadisticas.Otros.TiempoComputo.C + restoC) 
-			 / pseudoreloj;
-	*/
 			 
 	// Porcentaje de ocupación en mensajes rechazados
 	e.e.pORA = e.Estadisticas.Rechazados.TiempoComputo.A
@@ -622,18 +604,28 @@ function ActualizarEstadisticas(e, pseudoreloj){
 			 
 	// Porcentaje de mensajes rechazados
 	e.e.pMsgRechazado = e.e.Rechazados / e.e.NumTotal;
-	
+
+    //////////////////////////////////////////////////////////////////////
+    // Las siguienes estadísticas hay que obtenerlas por separado para:
+    // - Mensajes rechazados
+    // - Mensajes enviados
+    // - Todos los mensajes
+	var EstadisticasPorTipo = ["TiempoEnSistema", "Devoluciones", "TiempoColas", "TiempoTransmision", "ProcesamientoPorMensaje"];
+
+	EstadisticasPorTipo.forEach(function (cat) {
+	    e.e[cat + "Enviados"] = e.Estadisticas.Enviados[cat] / e.e.Enviados;
+	    e.e[cat + "Rechazados"] = e.Estadisticas.Rechazados[cat] / e.e.Rechazados;
+	    e.e[cat + "Todos"] = (e.Estadisticas.Enviados[cat] + e.Estadisticas.Rechazados[cat]) / e.e.NumTotal;
+	});
+	/*
 	// Tiempo promedio en el sistema por mensaje
-	e.e.TSistema = (e.Estadisticas.Enviados.TiempoEnSistema +
+	e.e.TiempoEnSistema = (e.Estadisticas.Enviados.TiempoEnSistema +
 					e.Estadisticas.Rechazados.TiempoEnSistema)
 					/ e.e.NumTotal;
 
 	// Promedio de devoluciones
-	e.e.DevolucionesB = (e.Estadisticas.Enviados.Devoluciones.B +
+	e.e.Devoluciones = (e.Estadisticas.Enviados.Devoluciones.B +
 					e.Estadisticas.Rechazados.Devoluciones.B)
-					/ e.e.NumTotal; 
-	e.e.DevolucionesC = (e.Estadisticas.Enviados.Devoluciones.C +
-					e.Estadisticas.Rechazados.Devoluciones.C)
 					/ e.e.NumTotal;
 					
 	// Tiempo promedio en colas
@@ -648,10 +640,10 @@ function ActualizarEstadisticas(e, pseudoreloj){
 	
 	// Porcentaje de tiempo en procesamiento
 	// por mensaje
-	e.e.PorcentajeProcesamiento = (e.Estadisticas.Enviados.ProcesamientoPorMensaje +
+	e.e.ProcesamientoPorMensaje = (e.Estadisticas.Enviados.ProcesamientoPorMensaje +
 					e.Estadisticas.Rechazados.ProcesamientoPorMensaje) /
 					e.e.NumTotal;
-	
+	*/
 	return e;
 }
 

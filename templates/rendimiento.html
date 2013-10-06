@@ -1,0 +1,106 @@
+﻿<h1>Rendimiento del sistema</h1>
+<table class="table table-hover table-bordered" style="width: 400px;">
+    <thead>
+        <tr>
+            <th></th>
+            <th></th>
+            <th colspan="3">Mensajes</th>
+            <th colspan="4">% ocupación</th>
+            <th colspan="2">% ocupación rechazados</th>
+            <th rowspan="2">% mensajes rechazados</th>
+        </tr>
+        <tr>
+            <th>Simulación</th>
+            <th>Reloj (minutos)</th>
+            <th>Enviados</th>
+            <th>Rechazados</th>
+            <th>Total</th>
+            <th>PC 1</th>
+            <!-- Porcentaje de tiempo computando -->
+            <th>PC 2.1</th>
+            <th>PC 2.2</th>
+            <th>PC 3</th>
+            <th>PC 1</th>
+            <!-- Porcentaje de tiempo computando rechazados -->
+            <th>PC 3</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="e in Simulaciones">
+            <td>{{Simulaciones.indexOf(e) + 1}}</td>
+            <td>{{e.Reloj | number:4}}</td>
+            <td>{{e.e.Enviados}}</td>
+            <td>{{e.e.Rechazados}}</td>
+            <td>{{e.e.NumTotal}}</td>
+
+            <td>{{e.e.pOA * 100 | number:4}}%</td>
+            <td>{{e.e.pOB1 * 100 | number:4}}%</td>
+            <td>{{e.e.pOB2 * 100 | number:4}}%</td>
+            <td>{{e.e.pOC * 100 | number:4}}%</td>
+
+            <td>{{e.e.pORA * 100 | number:4}}%</td>
+            <td>{{e.e.pORC * 100 | number:4}}%</td>
+
+            <td>{{e.e.pMsgRechazado  * 100 | number:4}}</td>
+        </tr>
+        <tr class="warning">
+            <th>Promedio total</th>
+            <td>{{Promedios.Reloj || 0 | number:4}}</td>
+            <td>{{Promedios.Enviados || 0 | number:4}}</td>
+            <td>{{Promedios.Rechazados || 0 | number:4}}</td>
+            <td>{{Promedios.NumTotal || 0 | number:4}}</td>
+
+            <td>{{Promedios.pOA * 100 || 0 | number:4}}%</td>
+            <td>{{Promedios.pOB1 * 100 || 0 | number:4}}%</td>
+            <td>{{Promedios.pOB2 * 100 || 0 | number:4}}%</td>
+            <td>{{Promedios.pOC * 100 || 0 | number:4}}%</td>
+
+            <td>{{Promedios.pORA * 100 || 0 | number:4}}%</td>
+            <td>{{Promedios.pORC * 100 || 0 | number:4}}%</td>
+
+            <td>{{Promedios.pMsgRechazado  * 100 || 0 | number:4}}</td>
+        </tr>
+        <tr class="success">
+            <th>Intervalo de confianza:</th>
+            <td>[{{Confianza.Reloj.Min || 0 | number:4}},
+{{Confianza.Reloj.Max || 0 | number:4}}]</td>
+
+            <td>[{{Confianza.Enviados.Min || 0 | number:4}},
+{{Confianza.Enviados.Max || 0 | number:4}}]</td>
+
+            <td>[{{Confianza.Rechazados.Min || 0 | number:4}},
+{{Confianza.Rechazados.Max || 0 | number:4}}]</td>
+
+            <td>[{{Confianza.NumTotal.Min || 0 | number:4}},
+{{Confianza.NumTotal.Max || 0 | number:4}}]</td>
+
+
+
+            <td>[{{Confianza.pOA.Min * 100 || 0 | number:4}}%,
+{{Confianza.pOA.Max * 100 || 0 | number:4}}%]</td>
+
+            <td>[{{Confianza.pOB1.Min * 100 || 0 | number:4}}%,
+{{Confianza.pOB1.Max * 100 || 0 | number:4}}%]</td>
+
+            <td>[{{Confianza.pOB2.Min * 100 || 0 | number:4}}%,
+{{Confianza.pOB2.Max * 100 || 0 | number:4}}%]</td>
+
+            <td>[{{Confianza.pOC.Min * 100 || 0 | number:4}}%,
+{{Confianza.pOC.Max * 100 || 0 | number:4}}%]</td>
+
+
+
+            <td>[{{Confianza.pORA.Min * 100 || 0 | number:4}}%,
+{{Confianza.pORA.Max * 100 || 0 | number:4}}%]</td>
+
+            <td>[{{Confianza.pORC.Min * 100 || 0 | number:4}}%,
+{{Confianza.pORC.Max * 100 || 0 | number:4}}%]</td>
+
+
+
+
+            <td>[{{Confianza.pMsgRechazado.Min  * 100 || 0 | number:4}},
+{{Confianza.pMsgRechazado.Max  * 100 || 0 | number:4}}]</td>
+        </tr>
+    </tbody>
+</table>

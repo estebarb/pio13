@@ -78,7 +78,7 @@ function CrearMensaje(estado){
 	return new Mensaje(
 		estado.Reloj,		// Hora creación
 		estado.Reloj,		// Hora evento
-		{B: 0, C: 0},		// Devoluciones
+		0,		// Devoluciones
 		0,					// PC anterior
 		0,	// T. Colas
 		0,	// T. Transmisión
@@ -132,7 +132,7 @@ function CrearEstadisticas(){
 		0,
 		{A:0, B1: 0, B2: 0, C:0},
 		0,
-		{B: 0, C: 0},
+		0,
 		0,
 		0,
 		0,
@@ -207,8 +207,7 @@ function Estado(Reloj, Colas, Eventos, Estados, Estadisticas){
 		pORC: 0,
 		pMsgRechazado: 0,
 		TSistema: 0,
-		DevolucionesB: 0,
-		DevolucionesC: 0,
+		Devoluciones: 0,
 		TiempoColas: 0,
 		TiempoTransmision: 0,
 		PorcentajeProcesamiento: 0

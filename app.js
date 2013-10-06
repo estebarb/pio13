@@ -217,10 +217,13 @@ function SimulacionCtrl($scope){
 		"Enviados", "Rechazados", "NumTotal",
 		"pOA", "pOB1", "pOB2", "pOC",
 		"pORA", "pORC",
-		"pMsgRechazado",
-		"DevolucionesB", "DevolucionesC",
-		"TSistema", "TiempoColas", "TiempoTransmision",
-		"PorcentajeProcesamiento"];
+		"pMsgRechazado"];
+
+		["TiempoEnSistema", "Devoluciones", "TiempoColas", "TiempoTransmision", "ProcesamientoPorMensaje"].forEach(function(tipo){
+		    ["Enviados", "Rechazados", "Todos"].forEach(function(cat){
+		        valores.push(tipo + cat);
+		    });
+		});
 		
 		// Para evitar divisiones entre 0
 		var total = Math.max(1, s.length);
@@ -232,9 +235,7 @@ function SimulacionCtrl($scope){
 			$scope.PorcentajeConfianza = 95;
 			alfa = 95;
 		}
-		//var alfa = (100 - $scope.PorcentajeConfianza)/100;
-		
-//		var t = TStudentDistribution(alfa / 2, total - 1);
+
 		var t = TStudentDistribution(alfa, total - 1);
 		
 		
@@ -257,8 +258,7 @@ function SimulacionCtrl($scope){
 				p[elemento] = media;
 				c[elemento] = {Max: media + mE, Min: media - mE};
 			}
-		);
-				
+		);				
 		
 		/////////////////////////////////////////////////////////
 		// Y se asigna al binding correspondiente:
