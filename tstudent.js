@@ -49,23 +49,46 @@ function TStudentDistribution(X, df) {
 	var ValoresInterpolar = [30, 40, 50, 60, 80, 100, 120];
 	var Interpolar = function(x1, fx1, x2, fx2, x){
 		// Se va a usar interpolación lineal...
-		return fx1 + (x - x1) * (fx2 - fx1) / (x2 -x1);
+		return fx1 + (x - x1) * (fx2 - fx1) / (x2 - x1);
 	};
+
+	if (-1 != ValoresInterpolar.indexOf(df)) {
+	    // El valor existe
+	    return ValoresStudent[29 + ValoresInterpolar.indexOf(df)];
+	}
 	
-	var anterior = Math.min.apply(null,
-		ValoresInterpolar.map(function(v){
-			return Math.min(df, v);
-		}));
-	var sucesor = Math.max.apply(null,
-		ValoresInterpolar.map(function(v){
-			return Math.max(df, v);
-		}));
+	var anterior = ValoresInterpolar.reduce(function (acc, c) {
+	    if (c < df) {
+	        return c;
+	    } else {
+	        return acc;
+	    }
+	}, df);
+	var sucesor = ValoresInterpolar.reduceRight(function (acc, c) {
+	    if (c > df) {
+	        return c;
+	    } else {
+	        return acc;
+	    }
+	}, df);
 	
+
+	var ant, sup;
+	ant = 29 + ValoresInterpolar.indexOf(anterior);
+	sup = 29 + ValoresInterpolar.indexOf(sucesor);
+	
+	console.log(
+		anterior,
+		ant,
+		sucesor,
+		sup,
+		df);
+
 	return Interpolar(
 		anterior,
-		ValoresStudent[29 + StudentDisponibles.indexOf(anterior)],
+		ant,
 		sucesor,
-		ValoresStudent[29 + StudentDisponibles.indexOf(sucesor)],
+		sup,
 		df
 	);
 }
