@@ -136,6 +136,7 @@ function HandlerRecibirMensajeC(estado, data) {
         estado.HoraOcupacion.C = estado.Reloj;
 
         // Tiempo atendiéndose:
+		// Un mensaje cada 4 segundos, tiempo exponencial
         var ta = DistribucionExponencial(60 / 4);
         // Se configura el evento "mensaje atendido por C":
         var evento = new FactoryEventos(
@@ -212,6 +213,7 @@ function HandlerRecibirMensajeA(estado, data) {
         estado.HoraOcupacion.A = estado.Reloj;
 
         // Tiempo atendiéndose:
+		// Se esperan 10 mensajes por minuto
         var ta = DistribucionExponencial(10);
         // Se configura el evento "mensaje atendido por A":
         var evento = new FactoryEventos(
@@ -502,6 +504,11 @@ function EstadisticasMensaje(e, m) {
     e.TiempoComputo.B1 += m.TiempoProcesamiento.B1;
     e.TiempoComputo.B2 += m.TiempoProcesamiento.B2;
     e.TiempoComputo.C += m.TiempoProcesamiento.C;
+	e.TiempoComputoG += ["A", "B1", "B2", "C"].map(function(c){
+			return m.TiempoProcesamiento[c];
+		}).reduce(function(a,b){
+			return a+b;
+		});
 
     // Total de tiempo en el sistema
     e.TiempoEnSistema += m.HoraEvento - m.HoraCreacion;
@@ -589,13 +596,35 @@ function ActualizarEstadisticas(e, pseudoreloj) {
     // - Mensajes rechazados
     // - Mensajes enviados
     // - Todos los mensajes
-    var EstadisticasPorTipo = ["TiempoEnSistema", "Devoluciones", "TiempoColas", "TiempoTransmision", "ProcesamientoPorMensaje"];
+    var EstadisticasPorTipo = ["TiempoEnSistema", "Devoluciones", "TiempoColas", "TiempoTransmision", "TiempoComputoG", "ProcesamientoPorMensaje"];
 
     EstadisticasPorTipo.forEach(function (cat) {
         e.e[cat + "Enviados"] = e.Estadisticas.Enviados[cat] / e.e.Enviados;
         e.e[cat + "Rechazados"] = e.Estadisticas.Rechazados[cat] / e.e.Rechazados;
         e.e[cat + "Todos"] = (e.Estadisticas.Enviados[cat] + e.Estadisticas.Rechazados[cat]) / e.e.NumTotal;
     });
+	
+	/*
+	e.e.TiempoComputoEnviados = ["A", "B1", "B2", "C"].map(function(l){
+			return e.Estadisticas.Enviados.TiempoComputo[l];
+		}).reduce(function(a,b){
+			return a+b;
+		}) / e.e.Enviados;
+		
+	e.e.TiempoComputoRechazados = ["A", "B1", "B2", "C"].map(function(l){
+		return e.Estadisticas.Rechazados.TiempoComputo[l];
+		}).reduce(function(a,b){
+			return a+b;
+		}) / e.e.Rechazados;
+	
+	e.e.TiempoComputoTodos = ["A", "B1", "B2", "C"].map(function(l){
+			return e.Estadisticas.Enviados.TiempoComputo[l] + 
+				e.Estadisticas.Rechazados.TiempoComputo[l];
+		}).reduce(function(a,b){
+			return a+b;
+		}) / e.e.NumTotal;
+	*/
+	
     /*
 	// Tiempo promedio en el sistema por mensaje
 	e.e.TiempoEnSistema = (e.Estadisticas.Enviados.TiempoEnSistema +

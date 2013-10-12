@@ -219,7 +219,7 @@ function SimulacionCtrl($scope){
 		"pORA", "pORC",
 		"pMsgRechazado"];
 
-		["TiempoEnSistema", "Devoluciones", "TiempoColas", "TiempoTransmision", "ProcesamientoPorMensaje"].forEach(function(tipo){
+		["TiempoEnSistema", "Devoluciones", "TiempoColas", "TiempoTransmision", "TiempoComputoG", "ProcesamientoPorMensaje"].forEach(function(tipo){
 		    ["Enviados", "Rechazados", "Todos"].forEach(function(cat){
 		        valores.push(tipo + cat);
 		    });
